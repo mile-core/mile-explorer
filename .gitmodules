@@ -1,0 +1,8 @@
+[submodule "vendor/mile-csa-jsonrpc-client"]
+	path = vendor/mile-csa-jsonrpc-client
+	url = https://lotus-mile@github.com/mile-core/mile-csa-jsonrpc-client.git
+	branch = master
+[submodule "vendor/mile-csa-dispatchq"]
+	path = vendor/mile-csa-dispatchq
+	url = https://lotus-mile@github.com/mile-core/mile-csa-dispatchq.git
+	branch = master
