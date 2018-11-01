@@ -12,7 +12,7 @@
 
 ## Build on Ubuntu 18.04 (boost version must be updated to 1.66.0-1.67.0)
 
-    $ git clone https://bitbucket.org/mile-core/mile-explorer
+    $ git clone https://github.com/mile-core/mile-explorer
     $ cd mile-explorer
     $ git submodule update --init --recursive --remote
     $ cd vendor/librethinkdbxx && make; cd ../..;
