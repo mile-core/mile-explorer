@@ -9,7 +9,6 @@
 using namespace milecsa::explorer;
 using namespace std;
 
-
 optional<Fetcher> Fetcher::Connect(
         const std::vector<std::string>  &urls,
         int update_timeout,

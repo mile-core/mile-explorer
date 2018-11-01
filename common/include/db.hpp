@@ -42,7 +42,7 @@ namespace milecsa::explorer{
         friend class db::Table;
 
         static optional<Db> Open(
-                const std::string &db_name = "blockchain",
+                const std::string &db_name = config::db_name,
                 const std::string &host = config::db_host,
                 int port = config::db_port);
         ~Db();

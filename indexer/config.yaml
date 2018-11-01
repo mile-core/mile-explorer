@@ -5,9 +5,9 @@
 #
 # Scainning nodes
 #
-node_urls: ["http://138.197.75.176:8080/v1/api",
-            "https://104.248.7.135:8080/v1/api",
-            "https://167.99.186.253:8080/v1/api"]
+node_urls: ["https://nyc03.t.mile.global/v1/api",
+            "https://nyc01.t.mile.global/v1/api",
+            "https://trnt01.t.mile.global/v1/api"]
 
 #node_urls: ["http://lotus000.testnet.mile.global/v1/api",
 #            "http://lotus001.testnet.mile.global/v1/api"]
