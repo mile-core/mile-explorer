@@ -1,3 +1,7 @@
+set(Boost_USE_STATIC_LIBS        ON)
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME     ON)
+set(CMAKE_CXX_FLAGS -pthread)
 
 set(CURRENT_TARGET_NAME mile-indexer)
 
@@ -15,6 +19,7 @@ include_directories(
         ../vendor/mile-csa-jsonrpc-client/include
         ../vendor/mile-csa-dispatchq/include
         ../vendor/spdlog
+	../vendor
         ${OPENSSL_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
         ${OPENSSL_INCLUDE_DIR}
