@@ -67,6 +67,6 @@ namespace milecsa::rpc::server {
 
 using namespace std;
 using namespace milecsa::rpc;
-using Db = optional<milecsa::explorer::Db>;
+using Db = std::optional<milecsa::explorer::Db>;
 
-#define MILECSA_JSONRPC_REGESTRY_METHOD(name,method) static auto v = server::Registry::Instance().add((name),(method))
+#define MILECSA_JSONRPC_REGESTRY_METHOD(name,method) static auto v = milecsa::rpc::server::Registry::Instance().add((name),(method))

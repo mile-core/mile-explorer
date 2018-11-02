@@ -9,10 +9,35 @@ using namespace milecsa::rpc::server;
 auto context::from_string(const std::string &name) -> void {
     try {
         auto json = nlohmann::json::parse(name);
-        message::parse(json, request);
+
+        if(!message::parse(json, request)){
+            make_response_invalid_request(*this);
+            return;
+        }
+
         response.id = request.id;
-    } catch (...) {
-        response.error=  message::response_error(message::response_error::error_code::ParseError, "ParseError");
+
+        if(!message::is_jsonrpc(json)){
+            make_response_invalid_request(*this);
+            return;
+        }
+
+        if(message::is_notify(json)){
+            make_response_invalid_request(*this);
+            return;
+        }
+
+        if(!message::is_valid_version(json)){
+            make_response_parse_error(*this,"WrongVersion");
+            return;
+        }
+
+    }
+    catch(nlohmann::json::parse_error& e) {
+        make_response_parse_error(*this, e.what());
+    }
+    catch (...) {
+        make_response_parse_error(*this,"json-rpc: unknown parse error");
     }
 }
 

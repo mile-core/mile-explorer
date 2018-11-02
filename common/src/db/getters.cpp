@@ -39,3 +39,8 @@ db::Data Db::get_block_history_state() const {
 db::Data Db::get_block_history(uint64_t first_id, uint64_t limit) const {
     return db::Table::Open(*this)->get_range(table::name::blocks, first_id, limit, "block-id");
 }
+
+db::Data Db::get_block(uint256_t block_id) const {
+    std::string id = UInt256ToDecString(block_id);
+    return db::Table::Open(*this)->get_by_id(table::name::blocks, id);
+}

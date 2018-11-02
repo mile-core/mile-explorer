@@ -16,7 +16,8 @@ namespace milecsa::rpc::server {
         struct request_message final {
             request_message() {}
 
-            request_message(std::string id, std::string method,
+            request_message(std::string id,
+                            std::string method,
                             nlohmann::json params)
                     : id(std::move(id)),
                       method(std::move(method)),
@@ -45,8 +46,8 @@ namespace milecsa::rpc::server {
                 MethodNotFound        = -32601,
                 InvalidParams         = -32602,
                 InternalError         = -32603,
-                serverErrorStart      = -32099,
-                serverErrorEnd        = -32000,
+                ServerErrorStart      = -32099,
+                ServerErrorEnd        = -32000,
                 ServerNotInitialized,
                 UnknownErrorCode      = -32001
             };
@@ -82,9 +83,16 @@ namespace milecsa::rpc::server {
             return msg.is_object() && !contains(msg,"id");
         }
 
-        ////TODO FIX
+        inline bool is_jsonrpc(const nlohmann::json &msg) {
+            return msg.is_object() && contains(msg,"jsonrpc");
+        }
+
+        inline bool is_valid_version(const nlohmann::json &msg) {
+            return msg.is_object() && contains(msg,"jsonrpc") && msg.at("jsonrpc").get<std::string>() == "2.0";
+        }
+
         inline bool is_request(const nlohmann::json &msg) {
-            return msg.is_object() /*&& contains(msg,"method")*/ && msg.at("method").is_string();
+            return msg.is_object() && contains(msg,"method") && msg.at("method").is_string();
         }
 
         inline bool is_response(const nlohmann::json &msg) {
@@ -92,17 +100,21 @@ namespace milecsa::rpc::server {
         }
 
         inline bool parse(const nlohmann::json &message, request_message &request) {
+
             if (!is_request(message)) {
                 return false;
             }
+
             request.id = message.at("id");
 
             request.method = message.at("method").get<std::string>();
+
             if (contains(message,"param")) {
-                request.params = message["param"];
+                request.params = message.at("param");
             } else {
-                request.params = message["params"];
+                request.params = message.at("params");
             }
+
             return true;
         }
 
@@ -144,12 +156,16 @@ namespace milecsa::rpc::server {
             nlohmann::json obj;
             obj["jsonrpc"] = nlohmann::json("2.0");
 
-            obj["result"] = msg.result;
+            if (!msg.result.is_null())
+                obj["result"] = msg.result;
 
             if (msg.error) {
                 nlohmann::json error = {{"code",    nlohmann::json(double(msg.error->code))},
                                         {"message", nlohmann::json(msg.error->message)},
-                                        {"data",    nlohmann::json(msg.error->data)}};
+                                        };
+                if (!msg.error->data.is_null())  {
+                    error["data"] = nlohmann::json(msg.error->data);
+                }
                 obj["error"] = nlohmann::json(error);
             }
 

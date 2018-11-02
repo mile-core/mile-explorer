@@ -81,17 +81,30 @@ namespace milecsa::rpc::server {
                                         (boost::posix_time::microsec_clock::local_time()
                                          - tick).total_milliseconds()/1000.0f;
 
-                    Logger::log->info("rpc::Server: {} <- \"{}\" {:03.4f}s.", path, ctx.request.method, diff);
+                    Logger::log->trace("rpc::Server: {} <- \"{}\" params:{} {:03.4f}s.",
+                            path,
+                            ctx.request.method,
+                            ctx.request.params.dump(),
+                            diff);
 
                     return send(std::move(res));
+
                 } else {
 
-                    make_response_error_non_method(ctx);
                     res.result(http::status::not_found);
+
+                    if (!ctx.response.error) {
+                        make_response_error_non_method(ctx);
+                    }
+
                     res.body() = ctx.to_json();
                     res.prepare_payload();
 
-                    Logger::err->error("rpc::Server: {} <- method \"{}\" not found", path, ctx.request.method);
+
+                    Logger::err->error("rpc::Server: {} <- request error[{}] {} <- {}",
+                            path, ctx.response.error ? ctx.response.error->code : -1,
+                            ctx.response.error ? ctx.response.error->message : "",
+                            req.body());
 
                     return send(std::move(res));
                 }

@@ -22,7 +22,7 @@ optional<Server> Server::Create(
 
         auto context = IoContext(new boost::asio::io_context(threads));
 
-        auto router = server::router::Create(db, version, target);
+        auto router = server::router::Create(db, version, target, error_handler);
 
         auto listener = std::make_shared<server::http::Listener>(
                 *context,

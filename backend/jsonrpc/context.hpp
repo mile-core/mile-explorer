@@ -36,5 +36,9 @@ namespace milecsa::rpc::server {
     inline auto make_response_error_non_method(context &ctx) -> void {
         ctx.response.error = message::response_error(message::response_error::error_code::MethodNotFound, "MethodNotFound");
     }
+
+    inline auto make_response_invalid_request(context &ctx) -> void {
+        ctx.response.error = message::response_error(message::response_error::error_code::InvalidRequest, "InvalidRequest");
+    }
 }
 

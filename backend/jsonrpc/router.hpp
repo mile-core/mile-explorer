@@ -8,6 +8,7 @@
 #include <boost/container/flat_map.hpp>
 #include <set>
 
+#include <milecsa.hpp>
 #include "jsonrpc/context.hpp"
 #include "db.hpp"
 
@@ -22,27 +23,40 @@ namespace milecsa::rpc::server {
         using storage_type = Container<std::string,method>;
 
         RpcBase(const std::optional<milecsa::explorer::Db>& db,
-                const std::string version,
-                const std::string target)
+                const std::string &version,
+                const std::string &target,
+                const milecsa::ErrorHandler &error_handler)
                 :
                 db(db),
                 version(version),
                 target(target),
-                path("/"+version+"/"+target)
+                path("/"+version+"/"+target),
+                error_handler(error_handler)
         {
 
         }
 
         ~RpcBase() = default;
 
-        bool apply(const std::string&name, context& ctx){
-            auto it = storage.find(name);
-            if( it == storage.end() ){
-                return false;
-            } else {
-                it->second(ctx,db);
-                return true;
+        bool apply(const std::string& name, context& ctx){
+            try {
+                auto it = storage.find(name);
+                if( it == storage.end() ){
+                    return false;
+                } else {
+                    it->second(ctx,db);
+                    return true;
+                }
             }
+            catch(nlohmann::json::parse_error& e) {
+                error_handler(milecsa::result::EXCEPTION, ErrorFormat("rpc::Server: router error: %s", e.what()));
+                make_response_parse_error(ctx);
+            }
+            catch (...) {
+                error_handler(milecsa::result::EXCEPTION, ErrorFormat("rpc::Server: router method %s: unknown error", name.c_str()));
+                ctx.response.result = nlohmann::json::array();
+            }
+            return false;
         }
 
         template <typename F>
@@ -63,11 +77,12 @@ namespace milecsa::rpc::server {
         const std::string &get_path() const { return path; }
 
     private:
+        std::optional<milecsa::explorer::Db> db;
         std::string  version;
         std::string  target;
         std::string  path;
         storage_type storage;
-        std::optional<milecsa::explorer::Db> db;
+        milecsa::ErrorHandler error_handler;
     };
 
     using flat_map   = RpcBase<boost::container::flat_map>;
@@ -78,10 +93,11 @@ namespace milecsa::rpc::server {
     namespace router {
         static inline Router Create(
                 const std::optional<milecsa::explorer::Db>& db,
-                const std::string version,
-                const std::string target
+                const std::string &version,
+                const std::string &target,
+                const milecsa::ErrorHandler &error_handler
         ) {
-            return Router(new flat_map(db, version,target));
+            return Router(new flat_map(db, version, target, error_handler));
         }
     }
 }

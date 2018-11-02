@@ -101,6 +101,7 @@ namespace milecsa::explorer{
 
         db::Data get_block_history_state() const ;
         db::Data get_block_history(uint64_t first_id, uint64_t limit) const;
+        db::Data get_block(uint256_t id) const;
 
     protected:
         const db::Connection get_connection() const;
@@ -138,7 +139,10 @@ namespace milecsa::explorer{
                     const std::map<string,db::Data> &data);
 
             db::Data get_state(const string &table_name, const string &id = "id") const;
+
             db::Data get_range(const string &table_name, uint64_t first_id, uint64_t limit, const string &id = "id", bool ordered=true) const;
+
+            db::Data get_by_id(const string &table_name, const string &id = "id") const;
 
         private:
             optional<Db> db_;

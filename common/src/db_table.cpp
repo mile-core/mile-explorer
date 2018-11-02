@@ -13,6 +13,18 @@
 using namespace milecsa::explorer;
 using namespace std;
 
+db::Data db::Table::get_by_id(const string &table_name, const string &id) const{
+    auto connection = db_->get_connection();
+    db::Driver::Term q = db_->query();
+
+    auto result = q
+            .table(table_name)
+            .get(id)
+            .run(*connection);
+
+    return db::Data::parse(result.to_datum().as_json());
+}
+
 db::Data db::Table::get_state(const string &table_name, const string &id) const {
 
     auto connection = db_->get_connection();
@@ -23,7 +35,7 @@ db::Data db::Table::get_state(const string &table_name, const string &id) const 
             .max(db::Driver::optargs("index", id))
             .run(*connection);
 
-    return nlohmann::json::parse(result.to_datum().as_json());
+    return db::Data::parse(result.to_datum().as_json());
 }
 
 db::Data db::Table::get_range(
@@ -42,14 +54,14 @@ db::Data db::Table::get_range(
                 .between(first_id, first_id + limit, db::Driver::optargs("index", id))
                 .order_by(db::Driver::optargs("index", id))
                 .run(*connection);
-        return nlohmann::json::parse(result.to_datum().as_json());
+        return db::Data::parse(result.to_datum().as_json());
     }
     else {
         auto result = q
                 .table(table_name)
                 .between(first_id, first_id + limit, db::Driver::optargs("index", id))
                 .run(*connection);
-        return nlohmann::json::parse(result.to_datum().as_json());
+        return db::Data::parse(result.to_datum().as_json());
     }
 
 }
