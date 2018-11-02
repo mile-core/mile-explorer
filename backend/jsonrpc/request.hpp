@@ -18,7 +18,7 @@ namespace milecsa::rpc::server {
     using namespace milecsa::explorer;
 
     inline auto fail(boost::system::error_code ec, char const *what) -> void {
-        Logger::err->error("Rpc::server: error[{}] {} / {}", ec.value(), ec.message(), what);
+        Logger::err->error("rpc::Server: error[{}] {} / {}", ec.value(), ec.message(), what);
     }
 
     namespace request {
@@ -59,7 +59,7 @@ namespace milecsa::rpc::server {
             }
 
             if( req.target().empty()  || path != rpc->get_path()) {
-                Logger::err->error("Rpc::server: path {} is forbidden", rpc->get_path());
+                Logger::err->error("rpc::Server: path {} is forbidden", rpc->get_path());
                 return send(std::move(http::response<http::string_body>{http::status::forbidden, req.version()}));
             }
 
@@ -74,14 +74,14 @@ namespace milecsa::rpc::server {
 
                 if (rpc->apply(ctx.request.method, ctx)) {
 
-                    res.body() = ctx.to_json();
+                    res.body() = ctx.to_json()+"\n";
                     res.prepare_payload();
 
                     auto diff = (float)
                                         (boost::posix_time::microsec_clock::local_time()
                                          - tick).total_milliseconds()/1000.0f;
 
-                    Logger::log->info("Rpc::server: {} <- \"{}\" {:03.4f}s.", path, ctx.request.method, diff);
+                    Logger::log->info("rpc::Server: {} <- \"{}\" {:03.4f}s.", path, ctx.request.method, diff);
 
                     return send(std::move(res));
                 } else {
@@ -91,7 +91,7 @@ namespace milecsa::rpc::server {
                     res.body() = ctx.to_json();
                     res.prepare_payload();
 
-                    Logger::err->error("Rpc::server: {} <- method \"{}\" not found", path, ctx.request.method);
+                    Logger::err->error("rpc::Server: {} <- method \"{}\" not found", path, ctx.request.method);
 
                     return send(std::move(res));
                 }
@@ -104,7 +104,7 @@ namespace milecsa::rpc::server {
                 return send(std::move(res));
             }
 
-            Logger::err->error("Rpc::server: {} HTTP method {} not allowed ", path, http_method);
+            Logger::err->error("rpc::Server: {} HTTP method {} not allowed ", path, http_method);
 
             return send(std::move( http::response<http::empty_body> {http::status::method_not_allowed,req.version()}));
         }

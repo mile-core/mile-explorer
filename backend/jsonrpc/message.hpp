@@ -11,6 +11,8 @@ namespace milecsa::rpc::server {
 
     namespace message {
 
+        static constexpr const int pretty_indent = 4;
+
         struct request_message final {
             request_message() {}
 
@@ -38,15 +40,15 @@ namespace milecsa::rpc::server {
                     : code(code), message(std::move(message)) {}
 
             enum error_code {
-                ParseError = -32700,
-                InvalidRequest = -32600,
-                MethodNotFound = -32601,
-                InvalidParams = -32602,
-                InternalError = -32603,
-                serverErrorStart = -32099,
-                serverErrorEnd = -32000,
+                ParseError            = -32700,
+                InvalidRequest        = -32600,
+                MethodNotFound        = -32601,
+                InvalidParams         = -32602,
+                InternalError         = -32603,
+                serverErrorStart      = -32099,
+                serverErrorEnd        = -32000,
                 ServerNotInitialized,
-                UnknownErrorCode = -32001
+                UnknownErrorCode      = -32001
             };
         };
 
@@ -135,7 +137,7 @@ namespace milecsa::rpc::server {
                 obj["params"] = msg.params;
             }
             obj["id"] = msg.id;
-            return nlohmann::json(obj).dump();
+            return nlohmann::json(obj).dump(message::pretty_indent);
         }
 
         inline std::string serialize(const response_message &msg) {
@@ -152,7 +154,7 @@ namespace milecsa::rpc::server {
             }
 
             obj["id"] = msg.id;
-            return nlohmann::json(obj).dump();
+            return nlohmann::json(obj).dump(message::pretty_indent);
         }
 
         inline std::string serialize(const notify_message &msg) {
@@ -163,7 +165,7 @@ namespace milecsa::rpc::server {
             if (!msg.params.is_null()) {
                 obj["params"] = msg.params;
             }
-            return nlohmann::json(obj).dump();
+            return nlohmann::json(obj).dump(message::pretty_indent);
         }
 
         inline const std::string &get_method(const nlohmann::json &msg) {
@@ -206,7 +208,7 @@ namespace milecsa::rpc::server {
                     obj["params"] = param;
                 }
                 obj["id"] = id;
-                return nlohmann::json(obj).dump();
+                return nlohmann::json(obj).dump(message::pretty_indent);
             }
 
             inline std::string serialize(const nlohmann::json &id, const std::string &method,
@@ -242,7 +244,7 @@ namespace milecsa::rpc::server {
                 if (!param.is_null()) {
                     obj["params"] = param;
                 }
-                return nlohmann::json(obj).dump();
+                return nlohmann::json(obj).dump(message::pretty_indent);
             }
 
             inline std::string serialize(const std::string &method,
@@ -261,7 +263,7 @@ namespace milecsa::rpc::server {
                     obj["result"] = result;
                 }
                 obj["id"] = id;
-                return nlohmann::json (obj).dump();
+                return nlohmann::json (obj).dump(message::pretty_indent);
             }
 
             inline std::string serialize(const nlohmann::json &id, const std::string &result,
