@@ -99,6 +99,9 @@ namespace milecsa::explorer{
         db::Data get_network_state() const ;
         db::Data get_nodes(uint64_t first_id, uint64_t limit) const ;
 
+        db::Data get_block_history_state() const ;
+        db::Data get_block_history(uint64_t first_id, uint64_t limit) const;
+
     protected:
         const db::Connection get_connection() const;
 
@@ -131,8 +134,11 @@ namespace milecsa::explorer{
 
             void update(
                     const string &table_name,
-                    const string id,
+                    const string &id,
                     const std::map<string,db::Data> &data);
+
+            db::Data get_state(const string &table_name, const string &id = "id") const;
+            db::Data get_range(const string &table_name, uint64_t first_id, uint64_t limit, const string &id = "id", bool ordered=true) const;
 
         private:
             optional<Db> db_;

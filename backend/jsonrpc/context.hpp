@@ -24,8 +24,9 @@ namespace milecsa::rpc::server {
     inline auto make_response_parse_error(context &ctx, const std::string &_error = "") -> void {
         if (_error.empty())
             ctx.response.error = message::response_error(message::response_error::error_code::ParseError, "ParseError");
-        else
+        else {
             ctx.response.error = message::response_error(message::response_error::error_code::ParseError, _error);
+        }
     }
 
     inline auto make_response_internal_error(context &ctx) -> void {

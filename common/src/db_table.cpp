@@ -13,6 +13,47 @@
 using namespace milecsa::explorer;
 using namespace std;
 
+db::Data db::Table::get_state(const string &table_name, const string &id) const {
+
+    auto connection = db_->get_connection();
+    db::Driver::Term q = db_->query();
+
+    auto result = q
+            .table(table_name)
+            .max(db::Driver::optargs("index", id))
+            .run(*connection);
+
+    return nlohmann::json::parse(result.to_datum().as_json());
+}
+
+db::Data db::Table::get_range(
+        const string &table_name,
+        uint64_t first_id,
+        uint64_t limit,
+        const string &id,
+        bool ordered
+) const {
+    auto connection = db_->get_connection();
+    db::Driver::Term q = db_->query();
+
+    if (ordered ) {
+        auto  result = q
+                .table(table_name)
+                .between(first_id, first_id + limit, db::Driver::optargs("index", id))
+                .order_by(db::Driver::optargs("index", id))
+                .run(*connection);
+        return nlohmann::json::parse(result.to_datum().as_json());
+    }
+    else {
+        auto result = q
+                .table(table_name)
+                .between(first_id, first_id + limit, db::Driver::optargs("index", id))
+                .run(*connection);
+        return nlohmann::json::parse(result.to_datum().as_json());
+    }
+
+}
+
 void db::Table::update(
         const string &table_name,
         const milecsa::explorer::db::Data &data) {
@@ -26,7 +67,7 @@ void db::Table::update(
 }
 
 void db::Table::update(const string &table_name,
-                       const string id,
+                       const string &id,
                        const map<string,db::Data> &data) {
 
     auto connection = db_->get_connection();
@@ -58,7 +99,7 @@ void db::Table::update(const string &table_name,
                 return db::Driver::object(
                         entry.first,
                         (*ff)[entry.first]
-                        .coerce_to("array").set_union(db::Driver::json(entry.second.dump()))
+                                .coerce_to("array").set_union(db::Driver::json(entry.second.dump()))
                 );
             };
 

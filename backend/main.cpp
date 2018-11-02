@@ -39,8 +39,9 @@ int main(int argc, char *argv[]) {
             milecsa::result code,
             const std::string &error){
         Logger::err->critical("rpc::Server fault: code[{}] {}", code, error);
-        exit(EXIT_FAILURE);
     };
+
+    server::Registry::Instance().set_error_handler(error_handler);
 
     auto server = Server::Create(
             db,

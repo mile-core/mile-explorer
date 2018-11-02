@@ -17,19 +17,25 @@ static auto method = [](server::context &ctx, const Db &db) {
             return;
         }
 
-        auto first_id = ctx.request.params.at("first-id").get<uint64_t>();
         auto limit = ctx.request.params.at("limit").get<uint64_t>();
 
-        ctx.response.result = db->get_nodes(first_id, limit);
+        if (limit>1000) {
+            make_response_parse_error(ctx, "limit params must be less then 1000");
+            return;
+        }
+
+        auto first_id = ctx.request.params.at("first-id").get<uint64_t>();
+
+        ctx.response.result = db->get_block_history(first_id, limit);
     }
     catch(nlohmann::json::parse_error& e) {
         server::Registry::Instance().error(e.what());
         make_response_parse_error(ctx);
     }
     catch (...) {
-        server::Registry::Instance().error("get-nodes: unknown error");
+        server::Registry::Instance().error("get-block-history: unknown error");
         ctx.response.result = nlohmann::json::array();
     }
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("get-nodes",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("get-block-history",method);

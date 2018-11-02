@@ -126,18 +126,22 @@ uint256_t Db::get_last_block_id() const {
     return 0;
 }
 
-void Db::add_block(const db::Data &block, uint256_t block_id) {
+void Db::add_block(const db::Data &_block, uint256_t block_id) {
 
     try {
 
         std::string id = UInt256ToDecString(block_id);
+        db::Data block = _block;
 
         {
+
+            block["block-id"] = std::stoull(id);
             db::Table::Open(*this)->update(table::name::blocks, block);
 
             db::Data state;
             state["id"] = id;
             state["block-id"] = std::stoull(id);
+
             db::Table::Open(*this)->update(table::name::blockchain_state, state);
         }
 

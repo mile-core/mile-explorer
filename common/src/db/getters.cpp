@@ -15,15 +15,7 @@ using namespace milecsa::explorer;
 using namespace std;
 
 db::Data Db::get_network_state() const {
-    auto connection = get_connection();
-    db::Driver::Term q = query();
-
-    auto result = q
-            .table(table::name::nodes_state)
-            .max(db::Driver::optargs("index", "id"))
-            .run(*connection);
-
-    return nlohmann::json::parse(result.to_datum().as_json());
+    return db::Table::Open(*this)->get_state(table::name::nodes_state);
 }
 
 db::Data Db::get_nodes(uint64_t first_id, uint64_t limit) const {
@@ -38,4 +30,12 @@ db::Data Db::get_nodes(uint64_t first_id, uint64_t limit) const {
             .limit(limit).run(*connection);
 
     return nlohmann::json::parse(result.to_datum().as_json());
+}
+
+db::Data Db::get_block_history_state() const {
+    return db::Table::Open(*this)->get_state(table::name::blockchain_state, "block-id");
+}
+
+db::Data Db::get_block_history(uint64_t first_id, uint64_t limit) const {
+    return db::Table::Open(*this)->get_range(table::name::blocks, first_id, limit, "block-id");
 }
