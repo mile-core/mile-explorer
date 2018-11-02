@@ -8,12 +8,19 @@
 #include <boost/program_options.hpp>
 #include <milecsa_queue.h>
 
+#include <boost/asio/ssl/stream.hpp>
+#include <boost/program_options.hpp>
+
 #include "db.hpp"
+#include "jsonrpc/rpc.hpp"
+#include "http/listener.hpp"
+#include "http/session.hpp"
 
 static std::string opt_config_file = "";
 
 namespace po = boost::program_options;
 using namespace milecsa::explorer;
+using namespace milecsa::rpc;
 
 static bool parse_cmdline(int ac, char *av[]);
 
@@ -29,10 +36,28 @@ int main(int argc, char *argv[]) {
     if (!db)
         exit(-1);
 
+    auto echo = [&](server::context &ctx) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1234));
+            ctx.response.result = true;
+    };
 
-    dispatch::Default::loop::run();
+    auto router = server::router::Create("v1", "api");
 
-    return 0;
+    router->add("ping", echo);
+
+    boost::asio::io_context ioc{10};
+
+    auto address = boost::asio::ip::make_address(config::http_bind_address);
+
+    std::make_shared<server::http::Listener>(
+            ioc,
+            boost::asio::ip::tcp::endpoint{address, config::http_port},
+            router
+    )->run();
+
+    ioc.run();
+
+    return EXIT_SUCCESS;
 }
 
 static bool parse_cmdline(int ac, char *av[]) {

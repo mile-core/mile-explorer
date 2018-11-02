@@ -207,7 +207,7 @@ void Fetcher::fetch_states(){
         auto client = this->get_rpc();
 
         if (!client){
-            Logger::err->warn("Fetcher: utility request failed, retrying}");
+            Logger::err->warn("Fetcher: utility request failed, retrying");
             std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }

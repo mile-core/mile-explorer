@@ -1,11 +1,13 @@
 set(CURRENT_TARGET_NAME mile-explorer-backend)
 
 include_directories(
-        ./jsonrpc-server
+        ./jsonrpc
 )
 
 file (GLOB BACKEND_SRC ${BACKEND_SRC}
-        ./jsonrpc-server/*.cpp
+        ./jsonrpc/*.cpp
+        ./jsonrpc/http/*.cpp
+        ./jsonrpc/https/*.cpp
         )
 
 set(EXT_SRC ${BACKEND_SRC})
