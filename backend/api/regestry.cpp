@@ -12,3 +12,9 @@ void registry::set_router(const server::Router &router){
         router->add(name,method);
     }
 }
+
+void registry::set_error_handler(milecsa::ErrorHandler &error_handler) {
+    error_handler_ = std::make_optional(error_handler);
+}
+
+std::optional<milecsa::ErrorHandler> registry::error_handler_ = std::nullopt;

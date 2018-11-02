@@ -43,4 +43,4 @@ json_rpc_debug: false
 #  critical = 5,
 #  off      = 6
 #
-log_level: 1
+log_level: 0

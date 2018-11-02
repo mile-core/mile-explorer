@@ -2,7 +2,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/settings.inc)
 
 file (GLOB COMMON_SRC ${COMMON_SRC}
         ../common/src/*.cpp
-        ../common/src/db-updates/*.cpp
+        ../common/src/db/*.cpp
         )
 
 

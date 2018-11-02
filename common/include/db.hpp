@@ -27,6 +27,7 @@ namespace milecsa::explorer{
 
     namespace db {
         namespace Driver = RethinkDB;
+        using   Args = RethinkDB::OptArgs;
         typedef Driver::Error Error;
         typedef RethinkDB::TimeoutException Timeout;
         typedef std::unique_ptr<Driver::Connection> Connection;
@@ -94,6 +95,9 @@ namespace milecsa::explorer{
          * @param block_id - ignoring at this version
          */
         void add_nodes_state(const db::Data &nodes_state, uint256_t block_id);
+
+        db::Data get_network_state() const ;
+        db::Data get_nodes(uint64_t first_id, uint64_t limit) const ;
 
     protected:
         const db::Connection get_connection() const;

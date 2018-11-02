@@ -8,6 +8,8 @@
 #include "jsonrpc/router.hpp"
 #include "db.hpp"
 
+#include <milecsa.hpp>
+
 #include <optional>
 #include <string>
 #include <iostream>
@@ -36,6 +38,13 @@ namespace milecsa::rpc::server {
     struct registry {
 
         void set_router(const server::Router &router);
+        void set_error_handler(milecsa::ErrorHandler& error_handler);
+
+        void error(const std::string &error) {
+            if(error_handler_){
+                (*error_handler_)(milecsa::result::EXCEPTION, error);
+            }
+        }
 
         template <typename F>
         bool add(std::string name, F&&f){
@@ -45,6 +54,7 @@ namespace milecsa::rpc::server {
 
     private:
         server::RpcBase<boost::container::flat_map>::storage_type storage_;
+        static std::optional<milecsa::ErrorHandler> error_handler_;
     };
 
     class Registry:public Singleton<registry>

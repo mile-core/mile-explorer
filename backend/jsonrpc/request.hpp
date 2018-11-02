@@ -66,7 +66,7 @@ namespace milecsa::rpc::server {
 
                     auto diff = (float)
                                         (boost::posix_time::microsec_clock::local_time()
-                                         - tick).total_milliseconds();///1000.0f;
+                                         - tick).total_milliseconds()/1000.0f;
 
                     Logger::log->info("Rpc::server: {} <- \"{}\" {:03.4f}s.", path, ctx.request.method, diff);
 

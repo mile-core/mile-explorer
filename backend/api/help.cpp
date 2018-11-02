@@ -4,7 +4,7 @@
 
 #include "api/registry.hpp"
 
-static auto help = [](server::context &ctx, const Db &db) {
+static auto method = [](server::context &ctx, const Db &db) {
     ctx.response.result = {
             "get-network-state",
             "get-nodes",
@@ -20,4 +20,4 @@ static auto help = [](server::context &ctx, const Db &db) {
     };
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("help",help);
+MILECSA_JSONRPC_REGESTRY_METHOD("help",method);

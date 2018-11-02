@@ -4,8 +4,8 @@
 
 #include "api/registry.hpp"
 
-static auto ping = [](server::context &ctx, const Db &db) {
+static auto method = [](server::context &ctx, const Db &db) {
     ctx.response.result = true;
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("ping",ping);
+MILECSA_JSONRPC_REGESTRY_METHOD("ping",method);
