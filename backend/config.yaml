@@ -12,6 +12,11 @@ db_port: 28015
 db_name: "blockchain"
 
 #
+# Concurrency connections
+#
+rpc_pool_size: 64
+
+#
 # Debug
 #
 json_rpc_debug: true

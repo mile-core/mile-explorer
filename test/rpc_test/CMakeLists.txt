@@ -1,0 +1,23 @@
+find_package (Threads)
+
+file (GLOB TESTS_SOURCES ${TESTS_SOURCES}
+        *.cpp
+        )
+
+set (TEST rpc_api_validation_${PROJECT_NAME})
+
+add_executable(${TEST} ${TESTS_SOURCES})
+
+set(MILECSA_LIBS milecsa milecsa_jsonrpc milecsa_dispatchq)
+
+target_link_libraries (
+        ${TEST}
+        ${PROJECT_LIB}
+        ${MILECSA_LIBS}
+        ${OPENSSL_SSL_LIBRARY}
+        ${OPENSSL_CRYPTO_LIBRARY}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${Boost_LIBRARIES})
+
+add_test (NAME rpc_api_validation COMMAND ${TEST})
+enable_testing ()

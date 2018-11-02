@@ -1,6 +1,10 @@
+//
+// Created by lotus mile on 02/11/2018.
+//
+
 #pragma once
 
-#include "message.hpp"
+#include "jsonrpc/message.hpp"
 
 namespace milecsa::rpc::server {
 

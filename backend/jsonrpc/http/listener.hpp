@@ -7,10 +7,10 @@
 #include <boost/asio/strand.hpp>
 #include <boost/asio/steady_timer.hpp>
 
-#include "http/session.hpp"
+#include "jsonrpc/http/session.hpp"
 
-#include "request.hpp"
-#include "rpc.hpp"
+#include "jsonrpc/request.hpp"
+#include "jsonrpc/router.hpp"
 
 namespace milecsa::rpc::server::http {
 

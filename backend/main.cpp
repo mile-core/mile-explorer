@@ -6,15 +6,14 @@
 #include <unistd.h>
 #include <yaml-cpp/yaml.h>
 #include <boost/program_options.hpp>
-#include <milecsa_queue.h>
-
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/program_options.hpp>
 
-#include "db.hpp"
-#include "jsonrpc/rpc.hpp"
-#include "http/listener.hpp"
-#include "http/session.hpp"
+//
+//#include "db.hpp"
+
+#include "jsonrpc/server.hpp"
+#include "api/registry.hpp"
 
 static std::string opt_config_file = "";
 
@@ -36,26 +35,25 @@ int main(int argc, char *argv[]) {
     if (!db)
         exit(-1);
 
-    auto echo = [&](server::context &ctx) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1234));
-            ctx.response.result = true;
+    milecsa::ErrorHandler error_handler =  [&](
+            milecsa::result code,
+            const std::string &error){
+        Logger::err->critical("rpc::Server fault: code[{}] {}", code, error);
+        exit(EXIT_FAILURE);
     };
 
-    auto router = server::router::Create("v1", "api");
+    auto server = Server::Create(
+            db,
+            config::http_bind_address,
+            config::http_port,
+            config::rpc_pool_size,
+            "v1",
+            "api",
+            error_handler);
 
-    router->add("ping", echo);
+    server::Registry::Instance().set_router(server->get_router());
 
-    boost::asio::io_context ioc{10};
-
-    auto address = boost::asio::ip::make_address(config::http_bind_address);
-
-    std::make_shared<server::http::Listener>(
-            ioc,
-            boost::asio::ip::tcp::endpoint{address, config::http_port},
-            router
-    )->run();
-
-    ioc.run();
+    server->run();
 
     return EXIT_SUCCESS;
 }
@@ -104,6 +102,7 @@ static bool parse_cmdline(int ac, char *av[]) {
 
         config::http_bind_address = config_nodes["http_bind_address"].as<string>();
         config::http_port = config_nodes["http_port"].as<unsigned short>();
+        config::rpc_pool_size = config_nodes["rpc_pool_size"].as<int>();
 
         milecsa::rpc::detail::RpcSession::debug_on = config_nodes["json_rpc_debug"].as<bool>();
 

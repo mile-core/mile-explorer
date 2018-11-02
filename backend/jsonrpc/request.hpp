@@ -1,3 +1,7 @@
+//
+// Created by lotus mile on 02/11/2018.
+//
+
 #pragma once
 
 #include <boost/beast/core.hpp>
@@ -6,7 +10,7 @@
 
 #include <iostream>
 
-#include "context.hpp"
+#include "jsonrpc/context.hpp"
 #include "logger.hpp"
 
 namespace milecsa::rpc::server {

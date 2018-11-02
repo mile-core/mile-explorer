@@ -66,8 +66,17 @@ namespace milecsa::explorer {
         ///
         /// Backend
         ///
+
+        /**
+         * Base http binding address and port
+         */
         static string         http_bind_address;
         static unsigned short http_port;
+
+        /**
+         * Concurrency requests handling pool size
+         */
+        static int            rpc_pool_size;
 
     };
 }

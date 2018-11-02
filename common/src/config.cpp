@@ -34,3 +34,4 @@ time_t config::request_timeout  = 20;
 ///
 string         config::http_bind_address = "0.0.0.0";
 unsigned short config::http_port         = 8042;
+int            config::rpc_pool_size     = 64;
