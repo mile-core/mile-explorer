@@ -25,6 +25,17 @@ namespace milecsa::rpc::server {
 
         namespace http = boost::beast::http;
 
+        template<class T>
+        void fill_cors(http::response<T> &res){
+            res.set(http::field::access_control_allow_origin, "*");
+            res.set(http::field::access_control_allow_methods,
+                    http::to_string(http::verb::post).to_string() +
+                    ", " +
+                    http::to_string(http::verb::options).to_string());
+            res.set(http::field::access_control_allow_headers, "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range");
+            res.set(http::field::access_control_expose_headers, "Content-Length,Content-Range");
+        }
+
         template<
                 class Body,
                 class Allocator,
@@ -38,6 +49,7 @@ namespace milecsa::rpc::server {
 
             auto tick = boost::posix_time::microsec_clock::local_time();
 
+            std::string http_method = http::to_string(req.method()).to_string();
             auto path = req.target().to_string();
 
             if (path.length() > 0) {
@@ -55,6 +67,7 @@ namespace milecsa::rpc::server {
 
                 http::response<http::string_body> res;
                 res.version(req.version());
+                fill_cors(res);
 
                 context ctx;
                 ctx.from_string(req.body());
@@ -84,8 +97,14 @@ namespace milecsa::rpc::server {
                 }
 
             }
+            else if (req.method() == http::verb::options) {
+                http::response<http::string_body> res;
+                res.version(req.version());
+                fill_cors(res);
+                return send(std::move(res));
+            }
 
-            Logger::err->error("Rpc::server: {} HTTP method not allowed ", path);
+            Logger::err->error("Rpc::server: {} HTTP method {} not allowed ", path, http_method);
 
             return send(std::move( http::response<http::empty_body> {http::status::method_not_allowed,req.version()}));
         }

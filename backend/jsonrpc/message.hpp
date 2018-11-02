@@ -198,10 +198,10 @@ namespace milecsa::rpc::server {
         }
 
         namespace request {
-            inline std::string serialize(const nlohmann::json &id, const std::string &medhod,
+            inline std::string serialize(const nlohmann::json &id, const std::string &method,
                                          const nlohmann::json &param = nlohmann::json()) {
                 nlohmann::json obj;
-                obj["method"] = nlohmann::json(medhod);
+                obj["method"] = nlohmann::json(method);
                 if (!param.is_null()) {
                     obj["params"] = param;
                 }
@@ -209,45 +209,45 @@ namespace milecsa::rpc::server {
                 return nlohmann::json(obj).dump();
             }
 
-            inline std::string serialize(const nlohmann::json &id, const std::string &medhod,
+            inline std::string serialize(const nlohmann::json &id, const std::string &method,
                                          const std::string &param) {
-                return serialize(id, medhod, nlohmann::json(param));
+                return serialize(id, method, nlohmann::json(param));
             }
 
-            inline std::string serialize(double id, const std::string &medhod,
+            inline std::string serialize(double id, const std::string &method,
                                          const std::string &param) {
-                return serialize(nlohmann::json(id), medhod, nlohmann::json(param));
+                return serialize(nlohmann::json(id), method, nlohmann::json(param));
             }
 
-            inline std::string serialize(double id, const std::string &medhod,
+            inline std::string serialize(double id, const std::string &method,
                                          const nlohmann::json &param = nlohmann::json()) {
-                return serialize(nlohmann::json(id), medhod, nlohmann::json(param));
+                return serialize(nlohmann::json(id), method, nlohmann::json(param));
             }
 
-            inline std::string serialize(const std::string &id, const std::string &medhod,
+            inline std::string serialize(const std::string &id, const std::string &method,
                                          const std::string &param) {
-                return serialize(nlohmann::json(id), medhod, nlohmann::json(param));
+                return serialize(nlohmann::json(id), method, nlohmann::json(param));
             }
 
-            inline std::string serialize(const std::string &id, const std::string &medhod,
+            inline std::string serialize(const std::string &id, const std::string &method,
                                          const nlohmann::json &param = nlohmann::json()) {
-                return serialize(nlohmann::json(id), medhod, nlohmann::json(param));
+                return serialize(nlohmann::json(id), method, nlohmann::json(param));
             }
         }
         namespace notify {
-            inline std::string serialize(const std::string &medhod,
+            inline std::string serialize(const std::string &method,
                                          const nlohmann::json &param = nlohmann::json()) {
                 nlohmann::json obj;
-                obj["method"] = nlohmann::json(medhod);
+                obj["method"] = nlohmann::json(method);
                 if (!param.is_null()) {
                     obj["params"] = param;
                 }
                 return nlohmann::json(obj).dump();
             }
 
-            inline std::string serialize(const std::string &medhod,
+            inline std::string serialize(const std::string &method,
                                          const std::string &param) {
-                return serialize(medhod, nlohmann::json(param));
+                return serialize(method, nlohmann::json(param));
             }
         }
         namespace responce {
