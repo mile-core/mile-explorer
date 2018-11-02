@@ -13,26 +13,22 @@
 
 #define __MASSIVE_Q_TEST 1
 
+
 static const nlohmann::json tests = R"([
-  {"method": "ping",                     "params": {} }
+  {"method": "help",                     "params": {} },
+  {"method": "ping",                     "params": {} },
+  {"method": "get-block-history-state",  "params": {} },
+  {"method": "get-block-history",        "params": {"first-id":0, "limit":3}},
+  {"method": "get-block",                "params": {"id":2}},
+  {"method": "get-network-state",        "params": {}},
+  {"method": "get-nodes",                "params": {"first-id":0, "limit":3}},
+  {"method": "get-transaction-history-state","params":{}},
+  {"method": "get-transaction-history",  "params": {"first-id":100,"limit":10}},
+  {"method": "get-transaction-info",     "params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx", "id":92}},
+  {"method": "get-wallet-history-state", "params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx"}},
+  {"method": "get-wallet-history-blocks","params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx", "first-id": 0, "limit": 2}},
+  {"method": "get-wallet-history-transactions", "params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx", "first-id": 0, "limit": 3}}
 ])"_json;
-
-
-//static const nlohmann::json tests = R"([
-//  {"method": "help",                     "params": {} },
-//  {"method": "ping",                     "params": {} },
-//  {"method": "get-block-history-state",  "params": {} },
-//  {"method": "get-block-history",        "params": {"first-id":0, "limit":3}},
-//  {"method": "get-block",                "params": {"id":2}},
-//  {"method": "get-network-state",        "params": {}},
-//  {"method": "get-nodes",                "params": {"first-id":0, "limit":3}},
-//  {"method": "get-transaction-history-state","params":{}},
-//  {"method": "get-transaction-history",  "params": {"first-id":100,"limit":10}},
-//  {"method": "get-transaction-info",     "params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx", "id":92}},
-//  {"method": "get-wallet-history-state", "params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx"}},
-//  {"method": "get-wallet-history-blocks","params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx", "first-id": 0, "limit": 2}},
-//  {"method": "get-wallet-history-transactions", "params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx", "first-id": 0, "limit": 3}}
-//])"_json;
 
 static std::string explorer_url = "http://localhost:8042/v1/api";
 
@@ -120,9 +116,9 @@ BOOST_FIXTURE_TEST_CASE( ping, SessionEval )
 {
     auto queue = dispatch::Queue(100);
 
-    for (int i = 0; i<100; i++) {
+    for (int i = 0; i<1000; i++) {
         queue.async([i, this] {
-            BOOST_CHECK(run_tests("ping"));
+            BOOST_CHECK(run_tests("get-block-history-state"));
             if (i==99) {
                 dispatch::Default::loop::exit();
             }
