@@ -42,3 +42,4 @@ include_directories(SYSTEM vendor/yaml-cpp/include)
 
 add_subdirectory(vendor)
 add_subdirectory(indexer)
+add_subdirectory(backend)

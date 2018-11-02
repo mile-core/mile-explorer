@@ -1,9 +1,13 @@
+//
+// Created by lotus mile on 02/11/2018.
+//
+
 #include <iostream>
 #include <unistd.h>
 #include <yaml-cpp/yaml.h>
 #include <boost/program_options.hpp>
+#include <milecsa_queue.h>
 
-#include "fetcher.hpp"
 #include "db.hpp"
 
 static std::string opt_config_file = "";
@@ -19,25 +23,12 @@ int main(int argc, char *argv[]) {
 
     if (!parse_cmdline(argc, argv))
         return -1;
-    
+
     auto db = milecsa::explorer::Db::Open();
 
     if (!db)
         exit(-1);
 
-    db->init();
-
-    auto fetcher = milecsa::explorer::Fetcher::Connect(
-            milecsa::explorer::config::node_urls,
-            milecsa::explorer::config::update_timeout,
-            db);
-
-    if (!fetcher)
-        exit(-1);
-
-    dispatch::Default::async([&]{
-        fetcher->run(db->get_start_block_id());
-    });
 
     dispatch::Default::loop::run();
 
@@ -82,23 +73,12 @@ static bool parse_cmdline(int ac, char *av[]) {
 
         YAML::Node config_nodes = YAML::LoadFile(opt_config_file);
 
-        YAML::Node urls = config_nodes["node_urls"];
-
-        config::node_urls.clear();
-        for (size_t i=0; i<urls.size(); i++) {
-            auto url = urls[i].as<string>();
-            config::node_urls.push_back(url);
-            Logger::log->trace("Configure: add node: {}", url);
-        }
-
-        config::request_timeout  = config_nodes["request_timeout"].as<int>();
-        config::update_timeout   = config_nodes["update_timeout"].as<int>();
-        config::rpc_queue_size   = config_nodes["rpc_queue_size"].as<int>();
-        config::block_processin_queue_size =  config_nodes["block_processin_queue_size"].as<int>();
-
         config::db_host = config_nodes["db_host"].as<string>();
         config::db_port = config_nodes["db_port"].as<unsigned short>();
         config::db_name = config_nodes["db_name"].as<string>();
+
+        config::http_bind_address = config_nodes["http_bind_address"].as<string>();
+        config::http_port = config_nodes["http_port"].as<unsigned short>();
 
         milecsa::rpc::detail::RpcSession::debug_on = config_nodes["json_rpc_debug"].as<bool>();
 
