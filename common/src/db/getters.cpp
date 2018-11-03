@@ -44,3 +44,9 @@ db::Data Db::get_block(uint256_t block_id) const {
     std::string id = UInt256ToDecString(block_id);
     return db::Table::Open(*this)->get_by_id(table::name::blocks, id);
 }
+
+std::pair<uint64_t,uint64_t> Db::get_wallet_history_state(const string &public_key) const {
+    db::Data block = db::Table::Open(*this)->get_count(table::name::wallets, public_key, "blocks");
+    db::Data trx   = db::Table::Open(*this)->get_count(table::name::wallets, public_key, "transactions");
+    return std::pair(block,trx);
+}

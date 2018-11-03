@@ -13,6 +13,31 @@
 using namespace milecsa::explorer;
 using namespace std;
 
+uint64_t db::Table::get_count(const string &table_name, const string &id, const string row) const {
+
+    auto connection = db_->get_connection();
+    db::Driver::Term q = db_->query();
+
+    if (row.empty()){
+        auto result = q
+                .table(table_name)
+                .get(id)
+                .count()
+                .run(*connection);
+
+        return db::Data::parse(result.to_datum().as_json());
+    }
+    else {
+        auto result = q
+                .table(table_name)
+                .get(id)[row]
+                .count()
+                .run(*connection);
+
+        return static_cast<uint64_t >(*result.to_datum().get_number());
+    }
+}
+
 db::Data db::Table::get_by_id(const string &table_name, const string &id) const{
     auto connection = db_->get_connection();
     db::Driver::Term q = db_->query();
@@ -24,6 +49,7 @@ db::Data db::Table::get_by_id(const string &table_name, const string &id) const{
 
     return db::Data::parse(result.to_datum().as_json());
 }
+
 
 db::Data db::Table::get_state(const string &table_name, const string &id) const {
 

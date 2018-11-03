@@ -103,6 +103,8 @@ namespace milecsa::explorer{
         db::Data get_block_history(uint64_t first_id, uint64_t limit) const;
         db::Data get_block(uint256_t id) const;
 
+        std::pair<uint64_t,uint64_t> get_wallet_history_state(const string &public_key) const;
+
     protected:
         const db::Connection get_connection() const;
 
@@ -143,6 +145,9 @@ namespace milecsa::explorer{
             db::Data get_range(const string &table_name, uint64_t first_id, uint64_t limit, const string &id = "id", bool ordered=true) const;
 
             db::Data get_by_id(const string &table_name, const string &id = "id") const;
+
+            uint64_t get_count(const string &table_name, const string &id = "id", const string row = "") const;
+
 
         private:
             optional<Db> db_;

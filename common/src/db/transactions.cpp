@@ -88,13 +88,17 @@ void Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_id){
 
 void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
 
+    std::string id = UInt256ToDecString(block_id);
+    auto _block_id = std::stoull(id);
+
     db::Data blocks;
-    blocks.push_back(UInt256ToDecString(block_id));
+    blocks.push_back(_block_id);
 
     for(const auto &entry: find_public_keys(trx)) {
 
         db::Data transaction_raw = {
                 {"id",   entry.second},
+                {"block-id",   _block_id},
                 {"transaction-type", trx["transaction-name"]}
         };
 
