@@ -44,3 +44,9 @@ add_subdirectory(vendor)
 add_subdirectory(indexer)
 add_subdirectory(backend)
 add_subdirectory(test)
+
+option(test "test" OFF)
+
+if (test)
+    enable_testing ()
+endif ()
