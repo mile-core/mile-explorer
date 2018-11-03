@@ -150,7 +150,13 @@ namespace milecsa::explorer{
 
             db::Data get_by_id(const string &table_name, const string &id = "id") const;
 
-            db::Data get_slice(const string &table_name, const string &id, const string &with, uint64_t first_id, uint64_t limit, bool ordered=true) const;
+            db::Data get_slice(const string &table_name,
+                    const string &id,
+                    const string &with,
+                    uint64_t first_id,
+                    uint64_t limit,
+                    const string order_by="",
+                    const string order_slice="") const;
 
             uint64_t get_count(const string &table_name, const string &id = "", const string with = "") const;
 

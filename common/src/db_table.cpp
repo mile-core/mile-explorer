@@ -18,7 +18,8 @@ db::Data db::Table::get_slice(
         const string &with,
         uint64_t first_id,
         uint64_t limit,
-        bool ordered) const {
+        const string order_by,
+        const string order_slice) const {
 
     try {
         auto connection = db_->get_connection();
@@ -26,11 +27,13 @@ db::Data db::Table::get_slice(
 
         auto table = id.empty() ? q.table(table_name) : q.table(table_name).get(id);
 
-        auto order = ordered ? table.order_by(db::Driver::optargs("index", id)) : table;
+        auto set   = with.empty() ? table : table[with];
 
-        auto set   = with.empty() ? order : order[with];
+        auto order = order_by.empty() ? set : set.order_by("order_by");
 
-        auto result = set
+        auto slice = order_slice.empty() ? order : order[order_slice];
+
+        auto result = slice
                 .skip(first_id)
                 .limit(limit).run(*connection);
 
