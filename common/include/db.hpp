@@ -105,6 +105,9 @@ namespace milecsa::explorer{
 
         std::pair<uint64_t,uint64_t> get_wallet_history_state(const string &public_key) const;
         db::Data get_wallet_history_blocks(const string &public_key, uint64_t first_id, uint64_t limit) const;
+        db::Data get_wallet_history_transactions(const string &public_key, uint64_t first_id, uint64_t limit) const;
+
+        uint64_t get_transaction_history_state() const;
 
     protected:
         const db::Connection get_connection() const;

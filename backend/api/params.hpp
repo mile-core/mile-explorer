@@ -19,7 +19,7 @@ namespace milecsa::explorer {
         constexpr const char *public_key = "public-key";
 
         inline auto error(context &ctx, const char *param) -> void {
-            return make_response_parse_error(ctx, ErrorFormat("%param %s not found", param));
+            return make_response_parse_error(ctx, ErrorFormat("param \"%s\" not found", param));
         }
 
         inline bool check(context &ctx, const char *param) {
