@@ -14,7 +14,6 @@
 
     $ git clone https://github.com/mile-core/mile-explorer
     $ cd mile-explorer
-    $ git submodule update --init --recursive --remote
     $ cd vendor/librethinkdbxx && make; cd ../..;
     $ mkdir build; cd build; cmake ..; make -j4
     
