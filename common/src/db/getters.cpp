@@ -24,7 +24,7 @@ db::Data Db::get_nodes(uint64_t first_id, uint64_t limit) const {
     db::Driver::Term q = query();
 
     auto result = q
-            .table("nodes_state")
+            .table(table::name::nodes_state)
             .max(db::Driver::optargs("index", "id"))["nodes"]
             .skip(first_id)
             .limit(limit).run(*connection);
@@ -67,6 +67,6 @@ db::Data Db::get_wallet_history_transactions(const string &public_key, uint64_t 
     return db::Table::Open(*this)->get_slice(table::name::wallets, public_key, "transactions", first_id, limit);
 }
 
-uint64_t Db::get_transaction_history_state() {
-    db::Table::Open(*this)->get_count(table::name::transactions, public_key);
+uint64_t Db::get_transaction_history_state() const {
+    return db::Table::Open(*this)->get_count(table::name::transactions);
 }

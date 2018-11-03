@@ -49,8 +49,21 @@ namespace milecsa::rpc::server {
                 }
             }
             catch(nlohmann::json::parse_error& e) {
-                error_handler(milecsa::result::EXCEPTION, ErrorFormat("rpc::Server: router error: %s", e.what()));
-                make_response_parse_error(ctx);
+                error_handler(milecsa::result::EXCEPTION, ErrorFormat("rpc::Server: parse error: %s", e.what()));
+                make_response_parse_error(ctx, e.what());
+            }
+            catch(nlohmann::json::invalid_iterator& e){
+                error_handler(milecsa::result::EXCEPTION, ErrorFormat("rpc::Server: invalid iterator error: %s", e.what()));
+                make_response_parse_error(ctx, e.what());
+            } catch(nlohmann::json::type_error & e){
+                error_handler(milecsa::result::EXCEPTION, ErrorFormat("rpc::Server: type error: %s", e.what()));
+                make_response_parse_error(ctx, e.what());
+            } catch(nlohmann::json::out_of_range& e){
+                error_handler(milecsa::result::EXCEPTION, ErrorFormat("rpc::Server: out of range error: %s", e.what()));
+                make_response_parse_error(ctx, e.what());
+            } catch(nlohmann::json::other_error& e){
+                error_handler(milecsa::result::EXCEPTION, ErrorFormat("rpc::Server: other error: %s", e.what()));
+                make_response_parse_error(ctx, e.what());
             }
             catch (...) {
                 error_handler(milecsa::result::EXCEPTION, ErrorFormat("rpc::Server: router method %s: unknown error", name.c_str()));

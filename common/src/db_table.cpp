@@ -17,15 +17,20 @@ db::Data db::Table::get_slice(
         const string &id,
         const string &with,
         uint64_t first_id,
-        uint64_t limit) const {
+        uint64_t limit,
+        bool ordered) const {
 
     try {
         auto connection = db_->get_connection();
         db::Driver::Term q = db_->query();
 
-        auto result = q
-                .table(table_name)
-                .get(id)[with]
+        auto table = id.empty() ? q.table(table_name) : q.table(table_name).get(id);
+
+        auto order = ordered ? table.order_by(db::Driver::optargs("index", id)) : table;
+
+        auto set   = with.empty() ? order : order[with];
+
+        auto result = set
                 .skip(first_id)
                 .limit(limit).run(*connection);
 
@@ -41,29 +46,23 @@ db::Data db::Table::get_slice(
 
 }
 
-uint64_t db::Table::get_count(const string &table_name, const string &id, const string row) const {
+uint64_t db::Table::get_count(const string &table_name, const string &id, const string with) const {
     try{
         auto connection = db_->get_connection();
         db::Driver::Term q = db_->query();
 
-        if (row.empty()){
-            auto result = q
-                    .table(table_name)
-                    .get(id)
-                    .count()
-                    .run(*connection);
+        auto table = id.empty() ? q.table(table_name) : q.table(table_name).get(id);
 
-            return db::Data::parse(result.to_datum().as_json());
+        db::Driver::Datum datum;
+
+        if (with.empty()){
+            datum = table.count().run(*connection).to_datum();
         }
         else {
-            auto result = q
-                    .table(table_name)
-                    .get(id)[row]
-                    .count()
-                    .run(*connection);
-
-            return static_cast<uint64_t >(*result.to_datum().get_number());
+            datum = table[with].count().run(*connection).to_datum();
         }
+
+        return db::Data::parse(datum.as_json());
     }
     catch (db::Timeout &e) {
         Db::err->warn("Table: {} timeout {}", table_name, e.what());
@@ -131,20 +130,27 @@ db::Data db::Table::get_range(
         auto connection = db_->get_connection();
         db::Driver::Term q = db_->query();
 
-        if (ordered) {
-            auto result = q
-                    .table(table_name)
-                    .between(first_id, first_id + limit, db::Driver::optargs("index", id))
-                    .order_by(db::Driver::optargs("index", id))
-                    .run(*connection);
-            return db::Data::parse(result.to_datum().as_json());
-        } else {
-            auto result = q
-                    .table(table_name)
-                    .between(first_id, first_id + limit, db::Driver::optargs("index", id))
-                    .run(*connection);
-            return db::Data::parse(result.to_datum().as_json());
-        }
+        auto table = q.table(table_name);
+        auto order = ordered ? table.order_by(db::Driver::optargs("index", id)) : table;
+
+        auto result = order.between(first_id, first_id + limit, db::Driver::optargs("index", id)).run(*connection);
+
+        return db::Data::parse(result.to_datum().as_json());
+
+//        if (ordered) {
+//            auto result = q
+//                    .table(table_name)
+//                    .between(first_id, first_id + limit, db::Driver::optargs("index", id))
+//                    .order_by(db::Driver::optargs("index", id))
+//                    .run(*connection);
+//            return db::Data::parse(result.to_datum().as_json());
+//        } else {
+//            auto result = q
+//                    .table(table_name)
+//                    .between(first_id, first_id + limit, db::Driver::optargs("index", id))
+//                    .run(*connection);
+//            return db::Data::parse(result.to_datum().as_json());
+//        }
     }
     catch (db::Timeout &e) {
         Db::err->warn("Table: {} timeout {}", table_name, e.what());
