@@ -11,17 +11,11 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     if (!api::params::check_limit(ctx)) return;
 
     auto limit = ctx.request.params.at(api::params::limit).get<uint64_t>();
-    auto id = ctx.request.params.at(api::params::first).get<std::string>();
 
-    //
-    // only check
-    //
-    uint256_t block_id;
-    if(!StringToUInt256(id, block_id, false)){
-        make_response_parse_error(ctx, "block couldn't be converted to uint256");
-        return;
-    }
-    uint64_t first_id = std::stoull(id);
+    uint256_t block_id = api::params::get_block_id(ctx, api::params::first);
+    if (block_id == uint256_t(-1)) return;
+
+    uint64_t first_id = static_cast<uint64_t>(block_id);
 
     ctx.response.result = db->get_block_history(first_id, limit);
 };

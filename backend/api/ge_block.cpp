@@ -8,17 +8,10 @@ using namespace milecsa::explorer;
 
 static auto method = [](server::context &ctx, const ctxDb &db) {
 
-    if (!api::params::check(ctx, api::params::id)) return;
+    uint256_t block_id = api::params::get_block_id(ctx, api::params::id);
+    if (block_id == uint256_t(-1)) return;
 
-    auto id = ctx.request.params.at(api::params::id).get<std::string>();
-    uint256_t block_id;
-
-    if(!StringToUInt256(id, block_id, false)){
-        make_response_parse_error(ctx, "block couldn't be converted to uint256");
-        return;
-    }
-
-    ctx.response.result = db->get_block(block_id);
+    ctx.response.result = db->get_block_by_id(block_id);
 };
 
 MILECSA_JSONRPC_REGESTRY_METHOD("get-block",method);

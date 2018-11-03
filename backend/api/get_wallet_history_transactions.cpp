@@ -12,8 +12,9 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     if (!api::params::check_limit(ctx)) return;
 
     auto public_key = ctx.request.params.at(api::params::public_key).get<std::string>();
-    auto first_id = ctx.request.params.at(api::params::first).get<uint64_t>();
+
     auto limit = ctx.request.params.at(api::params::limit).get<uint64_t>();
+    auto first_id = api::params::get_transaction_id(ctx, api::params::first);
 
     ctx.response.result = db->get_wallet_history_transactions(public_key,first_id,limit);
 };

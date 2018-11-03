@@ -43,5 +43,37 @@ namespace milecsa::explorer {
 
             return true;
         }
+
+        static inline uint256_t get_block_id(context &ctx, const char *param_name) {
+
+            if (!api::params::check(ctx, param_name)) return (uint256_t)(-1);
+
+            auto param = ctx.request.params.at(param_name);
+
+            if (param.is_number()) {
+                return param.get<std::uint64_t>();
+            }
+
+            auto id = param.get<std::string>();
+            uint256_t block_id;
+
+            if(!StringToUInt256(id, block_id, false)){
+                make_response_parse_error(ctx, "block couldn't be converted to uint256");
+                return uint256_t(-1);
+            }
+            return block_id;
+        }
+
+        static inline uint64_t get_transaction_id(context &ctx, const char *param_name) {
+            auto param = ctx.request.params.at(param_name);
+
+            if (param.is_number()) {
+                return param.get<std::uint64_t>();
+            }
+            else {
+                return std::stoull(param.get<std::string>());
+            }
+
+        }
     }
 }

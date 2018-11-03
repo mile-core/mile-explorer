@@ -29,7 +29,7 @@ db::Data db::Table::get_slice(
 
         auto set   = with.empty() ? table : table[with];
 
-        auto order = order_by.empty() ? set : set.order_by("order_by");
+        auto order = order_by.empty() ? set : set.order_by(order_by);
 
         auto slice = order_slice.empty() ? order : order[order_slice];
 
@@ -140,20 +140,6 @@ db::Data db::Table::get_range(
 
         return db::Data::parse(result.to_datum().as_json());
 
-//        if (ordered) {
-//            auto result = q
-//                    .table(table_name)
-//                    .between(first_id, first_id + limit, db::Driver::optargs("index", id))
-//                    .order_by(db::Driver::optargs("index", id))
-//                    .run(*connection);
-//            return db::Data::parse(result.to_datum().as_json());
-//        } else {
-//            auto result = q
-//                    .table(table_name)
-//                    .between(first_id, first_id + limit, db::Driver::optargs("index", id))
-//                    .run(*connection);
-//            return db::Data::parse(result.to_datum().as_json());
-//        }
     }
     catch (db::Timeout &e) {
         Db::err->warn("Table: {} timeout {}", table_name, e.what());

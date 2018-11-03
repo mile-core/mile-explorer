@@ -40,7 +40,7 @@ db::Data Db::get_block_history(uint64_t first_id, uint64_t limit) const {
     return db::Table::Open(*this)->get_range(table::name::blocks, first_id, limit, "block-id");
 }
 
-db::Data Db::get_block(uint256_t block_id) const {
+db::Data Db::get_block_by_id(uint256_t block_id) const {
     std::string id = UInt256ToDecString(block_id);
     return db::Table::Open(*this)->get_by_id(table::name::blocks, id);
 
@@ -74,4 +74,17 @@ db::Data Db::get_wallet_history_transactions(const string &public_key, uint64_t 
 
 uint64_t Db::get_transaction_history_state() const {
     return db::Table::Open(*this)->get_count(table::name::transactions);
+}
+
+db::Data Db::get_transaction_history(uint64_t first_id, uint64_t limit) const {
+    return db::Table::Open(*this)->get_slice(
+            table::name::transactions,
+            "",
+            "",
+            first_id, limit,
+            "block-id", "");
+}
+
+db::Data Db::get_transaction_by_id(const string &id) const {
+    return db::Table::Open(*this)->get_by_id(table::name::transactions, id);
 }
