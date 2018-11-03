@@ -170,7 +170,7 @@ void db::Table::update(const string &table_name,
     db::Driver::Term q = db_->query();
 
     auto result = q
-            .table(table::name::wallets)
+            .table(table_name)
             .get_all(id, R"({"index":"id"})").is_empty().run(*connection);
 
     auto status = *(result.to_datum().get_boolean());
@@ -185,7 +185,7 @@ void db::Table::update(const string &table_name,
             query[entry.first] = entry.second;
         }
 
-        q.table(table::name::wallets)
+        q.table(table_name)
                 .insert(db::Driver::json(query.dump()))
                 .run(*connection);
     } else {

@@ -1,0 +1,7 @@
+POST http://localhost:8042/v1/api
+Accept: */*
+Cache-Control: no-cache
+
+{"jsonrpc":"2.0","method":"get-wallet-node","params":{"public-key": "26DLdm7iJP51QKgUKU1jFW4fDS1qtiMNa2BMBG98sRfFyJXvD2"},"id":"1"}
+
+###

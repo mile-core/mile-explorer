@@ -94,7 +94,7 @@ namespace milecsa::explorer{
          * @param nodes_state
          * @param block_id - ignoring at this version
          */
-        void add_nodes_state(const db::Data &nodes_state, uint256_t block_id);
+        void add_node_states(const db::Data &nodes_state, uint256_t block_id);
 
         db::Data get_network_state() const ;
         db::Data get_nodes(uint64_t first_id, uint64_t limit) const ;
@@ -106,6 +106,7 @@ namespace milecsa::explorer{
         std::pair<uint64_t,uint64_t> get_wallet_history_state(const string &public_key) const;
         db::Data get_wallet_history_blocks(const string &public_key, uint64_t first_id, uint64_t limit) const;
         db::Data get_wallet_history_transactions(const string &public_key, uint64_t first_id, uint64_t limit) const;
+        db::Data get_wallet_node(const string &public_key) const;
 
         uint64_t get_transaction_history_state() const;
         db::Data get_transaction_history(uint64_t first_id, uint64_t limit) const;

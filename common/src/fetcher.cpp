@@ -225,7 +225,7 @@ void Fetcher::fetch_states(){
         block_id = *next_block_id;
 
         if(nodes->count("result")>0){
-            this->get_db()->add_nodes_state(nodes->at("result"), block_id);
+            this->get_db()->add_node_states(nodes->at("result"), block_id);
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(this->update_timeout_));

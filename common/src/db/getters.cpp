@@ -15,7 +15,7 @@ using namespace milecsa::explorer;
 using namespace std;
 
 db::Data Db::get_network_state() const {
-    return db::Table::Open(*this)->get_state(table::name::nodes_state);
+    return db::Table::Open(*this)->get_state(table::name::node_states);
 }
 
 db::Data Db::get_nodes(uint64_t first_id, uint64_t limit) const {
@@ -24,7 +24,7 @@ db::Data Db::get_nodes(uint64_t first_id, uint64_t limit) const {
     db::Driver::Term q = query();
 
     auto result = q
-            .table(table::name::nodes_state)
+            .table(table::name::node_states)
             .max(db::Driver::optargs("index", "id"))["nodes"]
             .skip(first_id)
             .limit(limit).run(*connection);
@@ -44,6 +44,10 @@ db::Data Db::get_block_by_id(uint256_t block_id) const {
     std::string id = UInt256ToDecString(block_id);
     return db::Table::Open(*this)->get_by_id(table::name::blocks, id);
 
+}
+
+db::Data Db::get_wallet_node(const string &public_key) const {
+    return db::Table::Open(*this)->get_by_id(table::name::node_wallets, public_key);
 }
 
 std::pair<uint64_t,uint64_t> Db::get_wallet_history_state(const string &public_key) const {
