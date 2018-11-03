@@ -1,0 +1,9 @@
+POST http://localhost:8042/v1/api
+Accept: */*
+Cache-Control: no-cache
+
+#{"jsonrpc":"2.0","method":"get-transaction","params":{"id": "25XmmZXDXbYrQMgSXQcCdcGvjec6iSR4hQ5AxfQJMC8NkMdGzZ:10675441032758331955"},"id":"1"}
+
+{"jsonrpc":"2.0","method":"get-transaction","params":{"id": 10675441032758331955, "public-key": "25XmmZXDXbYrQMgSXQcCdcGvjec6iSR4hQ5AxfQJMC8NkMdGzZ"},"id":"1"}
+
+###

@@ -6,8 +6,8 @@
 
 #include <milecsa.hpp>
 #include <milecsa_jsonrpc.hpp>
-#include "spdlog.h"
-#include "sinks/stdout_color_sinks.h"
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 #include "config.hpp"
 
 namespace milecsa::explorer {

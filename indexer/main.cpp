@@ -20,9 +20,6 @@ int main(int argc, char *argv[]) {
     if (!parse_cmdline(argc, argv))
         return -1;
 
-    milecsa::rpc::detail::RpcSession::debug_on = false;
-
-    auto main_thread_id = std::this_thread::get_id();
     auto db = milecsa::explorer::Db::Open();
 
     if (!db)
@@ -44,7 +41,7 @@ int main(int argc, char *argv[]) {
 
     dispatch::Default::loop::run();
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 static bool parse_cmdline(int ac, char *av[]) {

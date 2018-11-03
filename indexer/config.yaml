@@ -1,5 +1,5 @@
 #
-# Mile indexr configure
+# Mile indexer configure
 #
 
 #
@@ -30,17 +30,17 @@ db_name: "blockchain"
 #
 # Debug
 #
-json_rpc_debug: true
+json_rpc_debug: false
 
 #
 # Logging levels:
 #
-#  trace = 0,
-#  debug = 1,
-#  info = 2,
-#  warn = 3,
-#  err = 4,
+#  trace    = 0,
+#  debug    = 1,
+#  info     = 2,
+#  warn     = 3,
+#  err      = 4,
 #  critical = 5,
-#  off = 6
+#  off      = 6
 #
 log_level: 0

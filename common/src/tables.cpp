@@ -9,7 +9,8 @@ namespace milecsa::explorer::table {
 
     const vector<string>& get_names() {
         static vector<string> names = {
-                name::nodes_state,
+                name::node_states,
+                name::node_wallets,
                 name::blockchain_state,
                 name::blocks,
                 name::wallets,
@@ -23,7 +24,7 @@ namespace milecsa::explorer::table {
         static vector<index::description> indices = {
                 {name::blocks, "block-id"},
                 {name::blockchain_state, "block-id"},
-                {name::nodes_state, "block-id"},
+                {name::node_states, "block-id"},
                 {name::transactions, "block-id"}
         };
         return indices;

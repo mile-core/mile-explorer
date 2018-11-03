@@ -12,8 +12,12 @@ namespace milecsa::explorer {
 
     struct config {
 
+        ///
+        /// Common
+        ///
+
         /**
-         * Reyhink db host
+         * Rethink db host
          */
         static string         db_host;
 
@@ -23,9 +27,14 @@ namespace milecsa::explorer {
         static unsigned short db_port;
 
         /**
-        * Reyhink db name
+        * Rethink db name
         */
         static string         db_name;
+
+
+        ///
+        /// Indexer
+        ///
 
         /**
          * Scanning nodes
@@ -52,6 +61,22 @@ namespace milecsa::explorer {
          * Wait between request
          */
         static time_t request_timeout; // msec.
+
+
+        ///
+        /// Backend
+        ///
+
+        /**
+         * Base http binding address and port
+         */
+        static string         http_bind_address;
+        static unsigned short http_port;
+
+        /**
+         * Concurrency requests handling pool size
+         */
+        static int            rpc_pool_size;
 
     };
 }
