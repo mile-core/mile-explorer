@@ -34,7 +34,8 @@ optional<Server> Server::Create(
 
     }
     catch (boost::system::system_error &e){
-        error_handler(milecsa::result::FAIL, ErrorFormat("rpc::Server : %s", e.what()));
+        error_handler(milecsa::result::FAIL, ErrorFormat("rpc::Server create : %s", e.what()));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     return nullopt;
@@ -78,7 +79,8 @@ void Server::run() {
         ioc_->run();
     }
     catch (boost::system::system_error &e){
-        error_handler(milecsa::result::FAIL, ErrorFormat("rpc::Server : %s", e.what()));
+        error_handler(milecsa::result::FAIL, ErrorFormat("rpc::Server: run %s", e.what()));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }
 
