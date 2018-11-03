@@ -73,7 +73,7 @@ Cache-Control: no-cache
 
 ###### http request
 ```
-POST https://explorer.testnet.mile.global/v1/api
+POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
@@ -88,7 +88,7 @@ Cache-Control: no-cache
 
 ###### http request
 ```
-POST https://explorer.testnet.mile.global/v1/api
+POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
    
@@ -103,7 +103,7 @@ Cache-Control: no-cache
 
 ###### http request
 ```
-POST https://explorer.testnet.mile.global/v1/api
+POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
@@ -135,7 +135,7 @@ Cache-Control: no-cache
 
 ###### http request
 ```
-POST https://explorer.testnet.mile.global/v1/api
+POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
@@ -159,7 +159,7 @@ Cache-Control: no-cache
 
 ###### http request
 ```
-POST https://explorer.testnet.mile.global/v1/api
+POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
@@ -176,7 +176,7 @@ Cache-Control: no-cache
 
 ###### http request
 ```
-POST https://explorer.testnet.mile.global/v1/api
+POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
@@ -192,7 +192,7 @@ Cache-Control: no-cache
 
 ###### http request
 ```
-POST https://explorer.testnet.mile.global/v1/api
+POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
@@ -226,7 +226,7 @@ Cache-Control: no-cache
 
 ###### http request
 ```
-POST https://explorer.testnet.mile.global/v1/api
+POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
