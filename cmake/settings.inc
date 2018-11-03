@@ -15,6 +15,7 @@ include_directories(
         ../vendor/mile-csa-jsonrpc-client/vendor/mile-csa-api/vendor/mile-crypto/include
         ../vendor/mile-csa-dispatchq/include
         ../vendor/logger/spdlog
+	../vendor/logger
         ${OPENSSL_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
         ${OPENSSL_INCLUDE_DIR}
