@@ -4,20 +4,14 @@
 
 #include "api/registry.hpp"
 
-static auto method = [](server::context &ctx, const Db &db) {
+using namespace milecsa::explorer;
 
-    if (ctx.request.params.count("first-id") == 0) {
-        make_response_parse_error(ctx, "first-id params must be set");
-        return;
-    }
+static auto method = [](server::context &ctx, const ctxDb &db) {
 
-    if (ctx.request.params.count("limit") == 0) {
-        make_response_parse_error(ctx, "limit params must be set");
-        return;
-    }
+    if (!api::params::check_limit(ctx)) return;
 
-    auto first_id = ctx.request.params.at("first-id").get<uint64_t>();
-    auto limit = ctx.request.params.at("limit").get<uint64_t>();
+    auto first_id = ctx.request.params.at(api::params::id).get<uint64_t>();
+    auto limit = ctx.request.params.at(api::params::limit).get<uint64_t>();
 
     ctx.response.result = db->get_nodes(first_id, limit);
 };

@@ -4,7 +4,7 @@
 
 #include "api/registry.hpp"
 
-static auto method = [](server::context &ctx, const Db &db) {
+static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result = true;
 };
 

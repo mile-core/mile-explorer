@@ -4,14 +4,13 @@
 
 #include "api/registry.hpp"
 
-static auto method = [](server::context &ctx, const Db &db) {
+using namespace milecsa::explorer;
 
-    if (ctx.request.params.count("id") == 0) {
-        make_response_parse_error(ctx, "id params must be set");
-        return;
-    }
+static auto method = [](server::context &ctx, const ctxDb &db) {
 
-    auto id = ctx.request.params.at("id").get<std::string>();
+    if (!api::params::check(ctx, api::params::id)) return;
+
+    auto id = ctx.request.params.at(api::params::id).get<std::string>();
     uint256_t block_id;
 
     if(!StringToUInt256(id, block_id, false)){

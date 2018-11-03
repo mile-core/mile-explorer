@@ -2,7 +2,6 @@
 // Created by lotus mile on 01/11/2018.
 //
 
-
 #include <rethinkdb.h>
 #include <any>
 
@@ -13,55 +12,111 @@
 using namespace milecsa::explorer;
 using namespace std;
 
+db::Data db::Table::get_slice(
+        const string &table_name,
+        const string &id,
+        const string &with,
+        uint64_t first_id,
+        uint64_t limit) const {
+
+    try {
+        auto connection = db_->get_connection();
+        db::Driver::Term q = db_->query();
+
+        auto result = q
+                .table(table_name)
+                .get(id)[with]
+                .skip(first_id)
+                .limit(limit).run(*connection);
+
+        return db::Data::parse(result.to_datum().as_json());
+    }
+    catch (db::Timeout &e) {
+        Db::err->warn("Table: {} timeout {}", table_name, e.what());
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error get_slice: {}", table_name, e.message);
+    }
+    return db::Data::array();
+
+}
+
 uint64_t db::Table::get_count(const string &table_name, const string &id, const string row) const {
+    try{
+        auto connection = db_->get_connection();
+        db::Driver::Term q = db_->query();
 
-    auto connection = db_->get_connection();
-    db::Driver::Term q = db_->query();
+        if (row.empty()){
+            auto result = q
+                    .table(table_name)
+                    .get(id)
+                    .count()
+                    .run(*connection);
 
-    if (row.empty()){
+            return db::Data::parse(result.to_datum().as_json());
+        }
+        else {
+            auto result = q
+                    .table(table_name)
+                    .get(id)[row]
+                    .count()
+                    .run(*connection);
+
+            return static_cast<uint64_t >(*result.to_datum().get_number());
+        }
+    }
+    catch (db::Timeout &e) {
+        Db::err->warn("Table: {} timeout {}", table_name, e.what());
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error get_count: {}", table_name, e.message);
+    }
+    return 0;
+}
+
+db::Data db::Table::get_by_id(const string &table_name, const string &id) const{
+    try{
+        auto connection = db_->get_connection();
+        db::Driver::Term q = db_->query();
+
         auto result = q
                 .table(table_name)
                 .get(id)
-                .count()
                 .run(*connection);
 
         return db::Data::parse(result.to_datum().as_json());
     }
-    else {
-        auto result = q
-                .table(table_name)
-                .get(id)[row]
-                .count()
-                .run(*connection);
-
-        return static_cast<uint64_t >(*result.to_datum().get_number());
+    catch (db::Timeout &e) {
+        Db::err->warn("Table: {} timeout {}", table_name, e.what());
     }
-}
-
-db::Data db::Table::get_by_id(const string &table_name, const string &id) const{
-    auto connection = db_->get_connection();
-    db::Driver::Term q = db_->query();
-
-    auto result = q
-            .table(table_name)
-            .get(id)
-            .run(*connection);
-
-    return db::Data::parse(result.to_datum().as_json());
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error get_by_id: {}", table_name, e.message);
+    }
+    return db::Data::array();
 }
 
 
 db::Data db::Table::get_state(const string &table_name, const string &id) const {
 
-    auto connection = db_->get_connection();
-    db::Driver::Term q = db_->query();
+    try {
+        auto connection = db_->get_connection();
+        db::Driver::Term q = db_->query();
 
-    auto result = q
-            .table(table_name)
-            .max(db::Driver::optargs("index", id))
-            .run(*connection);
+        auto result = q
+                .table(table_name)
+                .max(db::Driver::optargs("index", id))
+                .run(*connection);
 
-    return db::Data::parse(result.to_datum().as_json());
+        return db::Data::parse(result.to_datum().as_json());
+    }
+    catch (db::Timeout &e) {
+        Db::err->warn("Table: {} timeout {}", table_name, e.what());
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error get_state: {}", table_name, e.message);
+    }
+    return db::Data::array();
+
 }
 
 db::Data db::Table::get_range(
@@ -71,25 +126,33 @@ db::Data db::Table::get_range(
         const string &id,
         bool ordered
 ) const {
-    auto connection = db_->get_connection();
-    db::Driver::Term q = db_->query();
 
-    if (ordered ) {
-        auto  result = q
-                .table(table_name)
-                .between(first_id, first_id + limit, db::Driver::optargs("index", id))
-                .order_by(db::Driver::optargs("index", id))
-                .run(*connection);
-        return db::Data::parse(result.to_datum().as_json());
-    }
-    else {
-        auto result = q
-                .table(table_name)
-                .between(first_id, first_id + limit, db::Driver::optargs("index", id))
-                .run(*connection);
-        return db::Data::parse(result.to_datum().as_json());
-    }
+    try {
+        auto connection = db_->get_connection();
+        db::Driver::Term q = db_->query();
 
+        if (ordered) {
+            auto result = q
+                    .table(table_name)
+                    .between(first_id, first_id + limit, db::Driver::optargs("index", id))
+                    .order_by(db::Driver::optargs("index", id))
+                    .run(*connection);
+            return db::Data::parse(result.to_datum().as_json());
+        } else {
+            auto result = q
+                    .table(table_name)
+                    .between(first_id, first_id + limit, db::Driver::optargs("index", id))
+                    .run(*connection);
+            return db::Data::parse(result.to_datum().as_json());
+        }
+    }
+    catch (db::Timeout &e) {
+        Db::err->warn("Table: {} timeout {}", table_name, e.what());
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error get_range: {}", table_name, e.message);
+    }
+    return db::Data::array();
 }
 
 void db::Table::update(

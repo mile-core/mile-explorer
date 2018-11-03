@@ -6,6 +6,7 @@
 
 #include "jsonrpc/context.hpp"
 #include "jsonrpc/router.hpp"
+#include "api/params.hpp"
 #include "db.hpp"
 
 #include <milecsa.hpp>
@@ -67,6 +68,6 @@ namespace milecsa::rpc::server {
 
 using namespace std;
 using namespace milecsa::rpc;
-using Db = std::optional<milecsa::explorer::Db>;
+using ctxDb = std::optional<milecsa::explorer::Db>;
 
 #define MILECSA_JSONRPC_REGESTRY_METHOD(name,method) static auto v = milecsa::rpc::server::Registry::Instance().add((name),(method))

@@ -4,7 +4,7 @@
 
 #include "api/registry.hpp"
 
-static auto method = [](server::context &ctx, const Db &db) {
+static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result = {
             "help",                              // +
             "ping",                              // +
@@ -13,7 +13,7 @@ static auto method = [](server::context &ctx, const Db &db) {
             "get-block-history-state",           // +
             "get-block-history",                 // +
             "get-block",                         // +
-            "get-wallet-history-state",
+            "get-wallet-history-state",          // +
             "get-wallet-history-blocks",
             "get-wallet-history-transactions",
             "get-transaction-history-state",
