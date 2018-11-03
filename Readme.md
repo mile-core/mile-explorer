@@ -19,7 +19,17 @@
     $ mkdir build; cd build; cmake ..; make -j4
     
 ## Build with user defined boost and open ssl paths
-    $ cmake CMakeLists.txt  -DBoost_NO_BOOST_CMAKE=TRUE -DBoost_NO_SYSTEM_PATHS=TRUE -DBOOST_ROOT=/home/USER1/boost_1_67_0/ -DBoost_LIBRARY_DIRS=/home/USER1/boost_1_67_0/stage/lib/ -DOPENSSL_INCLUDE_DIR=/home/USER1/openssl-1.0.2p/include -DOPENSSL_SSL_LIBRARY=/home/USER1/openssl-1.0.2p/libssl.so -DOPENSSL_CRYPTO_LIBRARY=/home/USER1/openssl-1.0.2p/libcrypto.so ..
+    $ cmake CMakeLists.txt  -DBoost_NO_BOOST_CMAKE=TRUE -DBoost_NO_SYSTEM_PATHS=TRUE -DBOOST_ROOT=<user-prefix-path>/boost_1_67_0/ -DBoost_LIBRARY_DIRS=<user-prefix-path>/boost_1_67_0/stage/lib/ -DOPENSSL_INCLUDE_DIR=<user-prefix-path>/openssl-1.0.2p/include -DOPENSSL_SSL_LIBRARY=<user-prefix-path>/openssl-1.0.2p/libssl.so -DOPENSSL_CRYPTO_LIBRARY=<user-prefix-path>/openssl-1.0.2p/libcrypto.so ..
+    $ make -j4
+
+## Build on OS X
+
+    $ cmake -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl ..
+    $ make -j4
+
+## Build Release
+    
+    $ cmake -DCMAKE_BUILD_TYPE=Release .. 
     $ make -j4
 
 ## Boost updates (if it needs)
