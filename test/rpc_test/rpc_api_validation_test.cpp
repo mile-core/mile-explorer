@@ -18,16 +18,16 @@ static const nlohmann::json tests = R"([
   {"method": "help",                     "params": {} },
   {"method": "ping",                     "params": {} },
   {"method": "get-block-history-state",  "params": {} },
-  {"method": "get-block-history",        "params": {"first-id":0, "limit":3}},
+  {"method": "get-block-history",        "params": {"first":0, "limit":3}},
   {"method": "get-block",                "params": {"id":2}},
   {"method": "get-network-state",        "params": {}},
-  {"method": "get-nodes",                "params": {"first-id":0, "limit":3}},
+  {"method": "get-nodes",                "params": {"first":0, "limit":3}},
   {"method": "get-transaction-history-state","params":{}},
-  {"method": "get-transaction-history",  "params": {"first-id":100,"limit":10}},
-  {"method": "get-transaction-info",     "params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx", "id":92}},
-  {"method": "get-wallet-history-state", "params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx"}},
-  {"method": "get-wallet-history-blocks","params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx", "first-id": 0, "limit": 2}},
-  {"method": "get-wallet-history-transactions", "params": {"public-key":"EUjuoTty9oHdF8h7ab4u3KCCci5dduFxvJbqAx5qXUUtk2Wnx", "first-id": 0, "limit": 3}}
+  {"method": "get-transaction-history",  "params": {"first":100,"limit":10}},
+  {"method": "get-transaction",     "params": {"public-key":"25XmmZXDXbYrQMgSXQcCdcGvjec6iSR4hQ5AxfQJMC8NkMdGzZ", "id":10675441032758331955}},
+  {"method": "get-wallet-history-state", "params": {"public-key":"25XmmZXDXbYrQMgSXQcCdcGvjec6iSR4hQ5AxfQJMC8NkMdGzZ"}},
+  {"method": "get-wallet-history-blocks","params": {"public-key":"25XmmZXDXbYrQMgSXQcCdcGvjec6iSR4hQ5AxfQJMC8NkMdGzZ", "first": 0, "limit": 2}},
+  {"method": "get-wallet-history-transactions", "params": {"public-key":"25XmmZXDXbYrQMgSXQcCdcGvjec6iSR4hQ5AxfQJMC8NkMdGzZ", "first": 0, "limit": 3}}
 ])"_json;
 
 static std::string explorer_url = "http://localhost:8042/v1/api";
@@ -112,7 +112,7 @@ struct SessionEval {
 };
 
 #if __MASSIVE_Q_TEST == 1
-BOOST_FIXTURE_TEST_CASE( ping, SessionEval )
+BOOST_FIXTURE_TEST_CASE( load, SessionEval )
 {
     auto queue = dispatch::Queue(100);
 
@@ -129,57 +129,67 @@ BOOST_FIXTURE_TEST_CASE( ping, SessionEval )
 }
 #endif
 
-//BOOST_FIXTURE_TEST_CASE( get_block_history_state, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-block-history-state"));
-//}
-//
-//BOOST_FIXTURE_TEST_CASE( get_block_history, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-block-history"));
-//}
-//
-//BOOST_FIXTURE_TEST_CASE( get_block, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-block"));
-//}
-//
-//BOOST_FIXTURE_TEST_CASE( get_network_state, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-network-state"));
-//}
-//
-//BOOST_FIXTURE_TEST_CASE( get_nodes, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-nodes"));
-//}
-//
-//BOOST_FIXTURE_TEST_CASE( get_transaction_history_state, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-transaction-history-state"));
-//}
-//
-//BOOST_FIXTURE_TEST_CASE( get_transaction_history, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-transaction-history"));
-//}
-//
-//BOOST_FIXTURE_TEST_CASE( get_transaction_info, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-transaction-info"));
-//}
-//
-//BOOST_FIXTURE_TEST_CASE( get_wallet_history_state, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-wallet-history-state"));
-//}
-//
-//BOOST_FIXTURE_TEST_CASE( get_wallet_history_blocks, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-wallet-history-blocks"));
-//}
-//
-//BOOST_FIXTURE_TEST_CASE( get_wallet_history_transactions, SessionEval )
-//{
-//    BOOST_CHECK(run_tests("get-wallet-history-transactions"));
-//}
+BOOST_FIXTURE_TEST_CASE( ping, SessionEval )
+{
+    BOOST_CHECK(run_tests("ping"));
+}
+
+BOOST_FIXTURE_TEST_CASE( help, SessionEval )
+{
+    BOOST_CHECK(run_tests("help"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_block_history_state, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-block-history-state"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_block_history, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-block-history"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_block, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-block"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_network_state, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-network-state"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_nodes, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-nodes"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_transaction_history_state, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-transaction-history-state"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_transaction_history, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-transaction-history"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_transaction_info, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-transaction-info"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_wallet_history_state, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-wallet-history-state"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_wallet_history_blocks, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-wallet-history-blocks"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_wallet_history_transactions, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-wallet-history-transactions"));
+}
