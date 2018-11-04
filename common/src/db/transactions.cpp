@@ -120,7 +120,7 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
 void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
 
     if(transactions.is_array()) {
-        int count;
+        int count = 0 ;
         for ( auto trx: transactions ) {
             add_stream_transaction(trx, block_id);
             add_wallet_transaction(trx, block_id);
