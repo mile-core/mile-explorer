@@ -54,7 +54,10 @@
 
     $ git clone https://github.com/mile-core/mile-explorer
     $ cd mile-explorer
-    $ docker build -t mile-explorer:$(git log -1 --format=%h) .
+    $ bash prepare-build.sh
+    $ docker-compose up -d rethinkdb
+    $ # ... wait 5-10 second
+    $ docker-compose up -d
 
 # MILE Explorer JSON-RPC API
 
