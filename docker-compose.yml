@@ -46,7 +46,7 @@ services:
     volumes:
       - ./etc/explorer.yaml:/app/config.yaml
     ports:
-      - "127.0.0.1:9998:9998"
+      - "127.0.0.1:8042:8042"
     networks:
       mile:
     logging:
