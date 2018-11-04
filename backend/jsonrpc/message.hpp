@@ -101,11 +101,11 @@ namespace milecsa::rpc::server {
 
         inline bool parse(const nlohmann::json &message, request_message &request) {
 
+            request.id = message.at("id");
+
             if (!is_request(message)) {
                 return false;
             }
-
-            request.id = message.at("id");
 
             request.method = message.at("method").get<std::string>();
 

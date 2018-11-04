@@ -10,6 +10,12 @@ auto context::from_string(const std::string &name) -> void {
     try {
         auto json = nlohmann::json::parse(name);
 
+        if(!message::is_valid_version(json)){
+            request.id = json.at("id");
+            make_response_parse_error(*this,"WrongVersion");
+            return;
+        }
+
         if(!message::parse(json, request)){
             make_response_invalid_request(*this);
             return;
@@ -24,11 +30,6 @@ auto context::from_string(const std::string &name) -> void {
 
         if(message::is_notify(json)){
             make_response_invalid_request(*this);
-            return;
-        }
-
-        if(!message::is_valid_version(json)){
-            make_response_parse_error(*this,"WrongVersion");
             return;
         }
 

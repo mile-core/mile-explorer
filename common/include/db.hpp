@@ -31,9 +31,10 @@ namespace milecsa::explorer{
         typedef Driver::Error Error;
         typedef RethinkDB::TimeoutException Timeout;
         typedef std::unique_ptr<Driver::Connection> Connection;
-        typedef Driver::Term Query;
+        typedef Driver::Term Result;
         typedef nlohmann::json Data;
         class Table;
+        class Cursor;
     }
 
     class Db: public Logger {
@@ -41,6 +42,7 @@ namespace milecsa::explorer{
     public:
 
         friend class db::Table;
+        friend class db::Cursor;
 
         static optional<Db> Open(
                 const std::string &db_name = config::db_name,
@@ -60,7 +62,7 @@ namespace milecsa::explorer{
          */
         const string get_name() const {return db_name_;};
 
-        db::Query query() const {return db::Driver::db(db_name_);};
+        db::Result query() const {return db::Driver::db(db_name_);};
 
         /**
          * Get the last block id indexed in DB
@@ -128,44 +130,4 @@ namespace milecsa::explorer{
         std::string    db_name_;
         uint256_t last_block_id_;
     };
-
-    namespace db{
-        class Table{
-        public:
-            static const shared_ptr<Table> Open(const optional<Db> &db){
-                return shared_ptr<Table>(new Table(db));
-            }
-
-            Table(const optional<Db> &db):db_(db){};
-
-            void update(
-                    const string &table_name,
-                    const db::Data &data);
-
-            void update(
-                    const string &table_name,
-                    const string &id,
-                    const std::map<string,db::Data> &data);
-
-            db::Data get_state(const string &table_name, const string &id = "id") const;
-
-            db::Data get_range(const string &table_name, uint64_t first_id, uint64_t limit, const string &id = "id", bool ordered=true) const;
-
-            db::Data get_by_id(const string &table_name, const string &id = "id") const;
-
-            db::Data get_slice(const string &table_name,
-                    const string &id,
-                    const string &with,
-                    uint64_t first_id,
-                    uint64_t limit,
-                    const string order_by="",
-                    const string order_slice="") const;
-
-            uint64_t get_count(const string &table_name, const string &id = "", const string with = "") const;
-
-
-        private:
-            optional<Db> db_;
-        };
-    }
 }
