@@ -2,7 +2,7 @@
 // Created by lotus mile on 31/10/2018.
 //
 
-#include "tables.hpp"
+#include "names.hpp"
 
 namespace milecsa::explorer::table {
     using namespace std;

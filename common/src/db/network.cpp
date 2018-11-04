@@ -7,7 +7,8 @@
 
 #include <milecsa_queue.h>
 #include "db.hpp"
-#include "tables.hpp"
+#include "table.hpp"
+#include "names.hpp"
 
 using namespace milecsa::explorer;
 using namespace std;

@@ -8,10 +8,6 @@
 #include <boost/program_options.hpp>
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/program_options.hpp>
-
-//
-//#include "db.hpp"
-
 #include "jsonrpc/server.hpp"
 #include "api/registry.hpp"
 
