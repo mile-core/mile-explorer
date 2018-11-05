@@ -13,7 +13,7 @@ RUN cd /app/vendor/librethinkdbxx && \
     mkdir -p build && \
     cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release ../ && \
-    make && \
+    make -j4 && \
     chmod +x /usr/local/bin/docker-entrypoint.sh && \
 
     apt autoremove -y --purge build-essential cmake python3-dev libssl-dev libcurl4-gnutls-dev git && \
