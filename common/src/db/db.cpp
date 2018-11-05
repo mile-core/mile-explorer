@@ -43,7 +43,9 @@ Db::Db(const std::string &db_name,
         :
         db_name_(db_name),
         host_(ip),
-        port_(port), exists_(exists){
+        port_(port),
+        last_block_id_(0),
+        exists_(exists){
     Db::log->trace("Db: {} connected to {}:{}", db_name_.c_str(), host_.c_str(), port_);
 }
 
@@ -107,20 +109,18 @@ bool Db::init() {
                 table->create_index(desc.field);
         }
 
-        if(!init_db) {
+        if(is_exist()) {
             try {
                 last_block_id_ = get_last_block_id();
                 Db::log->trace("Db: {} start at block-id: {}", db_name_.c_str(),  UInt256ToDecString(last_block_id_));
 
             } catch (db::Error &e) {
                 Db::err->error("Db: {} error reading last block id {}", db_name_.c_str(), e.message);
-                last_block_id_ = 0;
             }
         }
     }
     catch (db::Error &e) {
         Db::err->error("Db: {} error initializing {}", db_name_.c_str(), e.message);
-        last_block_id_ = 0;
     }
 
     Db::log->info("Db: {} is opened ...", db_name_.c_str());
