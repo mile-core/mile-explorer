@@ -29,6 +29,9 @@ namespace milecsa::explorer {
 
         typedef Driver::Term TableCursor;
 
+        /**
+         * Specific methodes for data selecting
+         */
         class Cursor {
         public:
             Cursor():db_(nullopt),cursor_(db::Driver::Datum(db::Driver::Nil())){};

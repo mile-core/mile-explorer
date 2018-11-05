@@ -21,7 +21,7 @@ void Db::add_node_states(const db::Data &nodes_state, uint256_t block_id){
             {"id", id},
     };
 
-    db::Table::Open(*this)->update(table::name::node_states, states);
+    db::Table::Open(*this, table::name::node_states)->update(states);
     Db::log->trace("Db: ... node states: {} block id {}", states.dump(), id);
 
     for (auto &item: nodes_state) {
@@ -33,7 +33,7 @@ void Db::add_node_states(const db::Data &nodes_state, uint256_t block_id){
         std::string id = item["public-key"];
         map<string,db::Data> ms;
         ms[id] = node;
-        db::Table::Open(*this)->update(table::name::node_wallets, id, node);
+        db::Table::Open(*this, table::name::node_wallets)->update(id, node);
 
         Db::log->trace("Db: ... node wallet[{}]: {}", id, node.dump());
     }

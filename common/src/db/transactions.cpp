@@ -82,7 +82,7 @@ void Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_id){
             replace_keys(from, to, trx);
         }
 
-        db::Table::Open(*this)->update(table::name::transactions, trx);
+        db::Table::Open(*this, table::name::transactions)->update(trx);
         Db::log->trace("Processing: stream transactions {}", trx.dump());
     }
 }
@@ -111,7 +111,7 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
                 {"transactions", transactions_col}
         };
 
-        db::Table::Open(*this)->update(table::name::wallets, entry.first, query);
+        db::Table::Open(*this, table::name::wallets)->update(entry.first, query);
 
         Db::log->trace("Processing: wallet transactions {}", transactions_col.dump());
     }

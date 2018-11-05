@@ -19,6 +19,7 @@ namespace milecsa::rpc::server::http {
     void Listener::on_accept(boost::system::error_code ec) {
         if(ec) {
             fail(ec, "accept");
+            exit(EXIT_FAILURE);
         } else {
             // Create the Session and run it
             std::make_shared<Session>(std::move(socket_), rpc)->run();
