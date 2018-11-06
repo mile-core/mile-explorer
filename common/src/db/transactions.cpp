@@ -82,7 +82,7 @@ void Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_id){
             replace_keys(from, to, trx);
         }
 
-        db::Table::Open(*this, table::name::transactions)->update(trx);
+        db::Table::Open(*this, table::name::transactions)->insert(trx);
         Db::log->trace("Processing: stream transactions {}", trx.dump());
     }
 }
@@ -119,13 +119,40 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
 
 void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
 
+    static bool first_time_update = true;
+
+    auto udpate_state = [&](){
+
+        uint64_t last_count = db::Table::Open(*this, table::name::transactions)
+                ->cursor()
+                .count()
+                .get_data();
+
+        db::Data state = {
+                {"id", "state"},
+                {"count", last_count}
+        };
+
+        db::Table::Open(*this, table::name::transactions_state)->update(state);
+
+        Db::log->info("Processing: transactions_state are: {}", last_count);
+
+        first_time_update = false;
+    };
+
+    if (first_time_update){
+        udpate_state();
+    }
+
     if(transactions.is_array()) {
-        int count = 0 ;
+        uint64_t count = 0 ;
         for ( auto trx: transactions ) {
             add_stream_transaction(trx, block_id);
             add_wallet_transaction(trx, block_id);
             count++;
         }
+
+        udpate_state();
 
         Db::log->info("Processing: {} transactions are processed", count);
     }

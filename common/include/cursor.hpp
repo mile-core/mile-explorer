@@ -52,7 +52,7 @@ namespace milecsa::explorer {
 
             Cursor slice(uint64_t first_id, uint64_t limit)const;
             Cursor between(uint64_t first_id, uint64_t limit, const string &id)const;
-            Cursor sort(const string &order_by_field_name)const;
+            Cursor sort(const string &index)const;
 
         private:
             optional<Db> db_;

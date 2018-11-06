@@ -22,13 +22,13 @@ void Db::add_block(const db::Data &_block, uint256_t block_id) {
 
         {
             block["block-id"] = std::stoull(id);
-            db::Table::Open(*this, table::name::blocks)->update(block);
+            db::Table::Open(*this, table::name::blocks)->insert(block);
 
             db::Data state;
             state["id"] = id;
             state["block-id"] = std::stoull(id);
 
-            db::Table::Open(*this, table::name::blockchain_state)->update(state);
+            db::Table::Open(*this, table::name::blockchain_state)->insert(state);
         }
 
         block_changes(block, block_id);

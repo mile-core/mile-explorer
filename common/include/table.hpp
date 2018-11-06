@@ -74,6 +74,8 @@ namespace milecsa::explorer {
              * Update table with json object
              * @param data
              */
+            void insert(const db::Data &data);
+
             void update(const db::Data &data);
 
             /**

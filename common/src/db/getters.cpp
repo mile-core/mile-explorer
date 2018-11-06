@@ -105,10 +105,9 @@ db::Data Db::get_wallet_history_blocks(const string &public_key, uint64_t first_
     return db::Table::Open(*this, table::name::wallets)
             ->cursor()
             .get(public_key)
-            .field("transactions")
-            .sort("block-id")
+            .field("blocks")
             .slice(first_id, limit)
-            .field("block-id")
+            //.field("block-id")
             .get_data();
 }
 
@@ -122,9 +121,10 @@ db::Data Db::get_wallet_history_transactions(const string &public_key, uint64_t 
 }
 
 uint64_t Db::get_transaction_history_state() const {
-    return db::Table::Open(*this, table::name::transactions)
+    return db::Table::Open(*this, table::name::transactions_state)
             ->cursor()
-            .count()
+            .get("state")
+            .field("count")
             .get_data();
 }
 

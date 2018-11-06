@@ -16,26 +16,30 @@ using namespace std;
 void Db::add_node_states(const db::Data &nodes_state, uint256_t block_id){
     std::string id = UInt256ToDecString(block_id);
 
+    Db::log->debug("Db: ... check node states for block-id: {}", id);
+
     db::Data states = {
             {"nodes", nodes_state},
             {"id", id},
     };
 
-    db::Table::Open(*this, table::name::node_states)->update(states);
+    db::Table::Open(*this, table::name::node_states)->insert(states);
     Db::log->trace("Db: ... node states: {} block id {}", states.dump(), id);
 
     for (auto &item: nodes_state) {
+        std::string pid = item["public-key"];
+
         db::Data node = {
                 {"address", item["address"]},
-                {"node-id", item["node-id"]}
+                {"node-id", item["node-id"]},
+                {"timestamp", time(0)},
+                {"block-id", id},
+                {"id", pid}
         };
 
-        std::string id = item["public-key"];
-        map<string,db::Data> ms;
-        ms[id] = node;
-        db::Table::Open(*this, table::name::node_wallets)->update(id, node);
+        db::Table::Open(*this, table::name::node_wallets)->update(node);
 
-        Db::log->trace("Db: ... node wallet[{}]: {}", id, node.dump());
+        Db::log->trace("Db: ... node wallet[{}]: {}", pid, node.dump());
     }
 
 }

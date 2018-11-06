@@ -15,6 +15,7 @@ namespace milecsa::explorer::table {
                 name::blocks,
                 name::wallets,
                 name::transactions,
+                name::transactions_state
         };
 
         return names;

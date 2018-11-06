@@ -17,12 +17,13 @@ namespace milecsa::explorer{
     namespace table {
 
         namespace name {
-            constexpr const char *blockchain_state  = "blockchain_state";
-            constexpr const char *node_states       = "node_states";
-            constexpr const char *node_wallets      = "node_wallets";
-            constexpr const char *blocks            = "blocks";
-            constexpr const char *wallets           = "wallets";
-            constexpr const char *transactions      = "transactions";
+            constexpr const char *blockchain_state   = "blockchain_state";
+            constexpr const char *node_states        = "node_states";
+            constexpr const char *node_wallets       = "node_wallets";
+            constexpr const char *blocks             = "blocks";
+            constexpr const char *wallets            = "wallets";
+            constexpr const char *transactions       = "transactions";
+            constexpr const char *transactions_state = "transactions_state";
         }
 
         namespace index {
