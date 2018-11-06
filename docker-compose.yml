@@ -1,0 +1,57 @@
+version: '3.2'
+
+networks:
+  mile:
+    driver: bridge
+
+services:
+  rethinkdb:
+    image: rethinkdb:2.3
+    container_name: rethinkdb
+    restart: on-failure
+    hostname: rethinkdb
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./rethinkdb:/data
+    networks:
+      mile:
+
+  indexer:
+    image: mile-explorer:${VER}
+    container_name: indexer
+    command: -a indexer -c /app/config.yaml
+    restart: on-failure
+    hostname: indexer
+    depends_on:
+      - rethinkdb
+    volumes:
+      - ./etc/indexer.yaml:/app/config.yaml
+    networks:
+      mile:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  explorer:
+    image: mile-explorer:${VER}
+    container_name: explorer
+    command: -a explorer -c /app/config.yaml
+    restart: on-failure
+    hostname: explorer
+    depends_on:
+      - rethinkdb
+    volumes:
+      - ./etc/explorer.yaml:/app/config.yaml
+    ports:
+      - "127.0.0.1:8042:8042"
+    networks:
+      mile:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+

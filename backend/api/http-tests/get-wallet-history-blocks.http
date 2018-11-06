@@ -2,6 +2,6 @@ POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
-{"jsonrpc":"2.0","method":"get-wallet-history-blocks","params":{"public-key": "eZrf8Eq1qDvSCEfdeezBRhT3QSf5GkrQH9tzGNaYt8q8gH5aZ", "first": "0", "limit": 100},"id":"1"}
+{"jsonrpc":"2.0","method":"get-wallet-history-blocks","params":{"public-key": "eZrf8Eq1qDvSCEfdeezBRhT3QSf5GkrQH9tzGNaYt8q8gH5aZ", "first": "0", "limit": 1000},"id":"1"}
 
 ###

@@ -5,19 +5,19 @@
 #
 # Scainning nodes
 #
-node_urls: ["https://nyc03.t.mile.global/v1/api",
-            "https://nyc01.t.mile.global/v1/api",
-            "https://trnt01.t.mile.global/v1/api"]
+#node_urls: ["https://nyc03.t.mile.global/v1/api",
+#            "https://nyc01.t.mile.global/v1/api",
+#            "https://trnt01.t.mile.global/v1/api"]
 
-#node_urls: ["http://lotus000.testnet.mile.global/v1/api",
-#            "http://lotus001.testnet.mile.global/v1/api"]
+node_urls: ["http://lotus000.testnet.mile.global/v1/api",
+            "http://lotus001.testnet.mile.global/v1/api"]
 
 #
 # Processing options
 #
 request_timeout: 50 # msec.
 update_timeout:  20  # sec.
-rpc_queue_size:  20
+rpc_queue_size:  200
 block_processin_queue_size: 10
 
 #

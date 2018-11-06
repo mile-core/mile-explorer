@@ -50,6 +50,15 @@
     $ docker run --name mile-rethink -v "$PWD:/data" -d rethinkdb
     # open in browser http://localhost:8080
 
+## Build as docker image
+
+    $ git clone https://github.com/mile-core/mile-explorer
+    $ cd mile-explorer
+    $ bash prepare-build.sh
+    $ docker-compose up -d rethinkdb
+    $ # ... wait 5-10 second
+    $ docker-compose up -d
+
 # MILE Explorer JSON-RPC API
 
 ## Help

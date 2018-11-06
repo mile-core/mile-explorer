@@ -19,6 +19,7 @@ namespace milecsa::rpc::server {
 
     inline auto fail(boost::system::error_code ec, char const *what) -> void {
         Logger::err->error("rpc::Server: error[{}] {} / {}", ec.value(), ec.message(), what);
+        std::this_thread::sleep_for(std::chrono::milliseconds(config::request_timeout));
     }
 
     namespace request {

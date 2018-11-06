@@ -22,7 +22,15 @@ db::Data db::Cursor::get_data()  {
 
         auto result = cursor_.run(*connection);
 
-        auto data = db::Data::parse(result.to_datum().as_json());
+        auto object = result.to_datum();
+
+        db::Data data;
+        if (object.is_nil()) {
+            data = db::Data::array();
+        }
+        else {
+            data = db::Data::parse(object.as_json());
+        }
 
         Db::log->trace("Table: {} get_data(): {}", db_->get_name(), data.dump());
         return data;
@@ -114,10 +122,10 @@ db::Cursor db::Cursor::between(uint64_t first_id, uint64_t limit, const string &
     return db::Cursor();
 }
 
-db::Cursor db::Cursor::sort(const string &order_by_field_name)const {
+db::Cursor db::Cursor::sort(const string &index)const {
     try {
 
-        auto result = cursor_.order_by(order_by_field_name);
+        auto result = cursor_.order_by(db::Driver::optargs("index", index));
 
         return  db::Cursor(
                 result,
