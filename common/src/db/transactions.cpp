@@ -13,6 +13,30 @@
 using namespace milecsa::explorer;
 using namespace std;
 
+static bool first_time_update = true;
+
+auto udpate_state = [](Db *db){
+
+    uint64_t last_count = db::Table::Open(*db, table::name::transactions)
+            ->cursor()
+            .count()
+            .get_data();
+
+    db::Data state = {
+            {"id", "state"},
+            {"count", last_count}
+    };
+
+    db::Table::Open(*db, table::name::transactions_state)->update(state);
+
+    if (first_time_update)
+        Db::log->info("Processing: transactions_state has ben updated, count: {}", last_count);
+    else
+        Db::log->info("Processing: transactions_state count: {}", last_count);
+
+    first_time_update = false;
+};
+
 void Db::block_changes(const db::Data &block, uint256_t id) {
 
     try {
@@ -22,6 +46,8 @@ void Db::block_changes(const db::Data &block, uint256_t id) {
 
         if (trx.is_array()) {
             add_transactions(trx, id);
+        }else  if (first_time_update){
+            udpate_state(this);
         }
     }
     catch (db::Timeout &e) {
@@ -119,29 +145,8 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
 
 void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
 
-    static bool first_time_update = true;
-
-    auto udpate_state = [&](){
-
-        uint64_t last_count = db::Table::Open(*this, table::name::transactions)
-                ->cursor()
-                .count()
-                .get_data();
-
-        db::Data state = {
-                {"id", "state"},
-                {"count", last_count}
-        };
-
-        db::Table::Open(*this, table::name::transactions_state)->update(state);
-
-        Db::log->info("Processing: transactions_state are: {}", last_count);
-
-        first_time_update = false;
-    };
-
     if (first_time_update){
-        udpate_state();
+        udpate_state(this);
     }
 
     if(transactions.is_array()) {
@@ -152,7 +157,7 @@ void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
             count++;
         }
 
-        udpate_state();
+        udpate_state(this);
 
         Db::log->info("Processing: {} transactions are processed", count);
     }
