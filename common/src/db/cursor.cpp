@@ -93,7 +93,7 @@ db::Cursor db::Cursor::field(const string &field_name) const {
 db::Cursor db::Cursor::slice(uint64_t first_id, uint64_t limit)const {
     try {
 
-        auto result = cursor_.skip(first_id).limit(limit);
+        auto result = cursor_.slice(first_id,first_id+limit);//skip(first_id).limit(limit);
 
         return  db::Cursor(
                 result,
