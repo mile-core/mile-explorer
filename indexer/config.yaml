@@ -17,8 +17,8 @@ node_urls: ["http://lotus000.testnet.mile.global/v1/api",
 #
 request_timeout: 50 # msec.
 update_timeout:  20  # sec.
-rpc_queue_size:  200
-block_processin_queue_size: 10
+rpc_queue_size:  50
+block_processin_queue_size: 16
 
 #
 # Db connection

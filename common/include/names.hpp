@@ -24,6 +24,7 @@ namespace milecsa::explorer{
             constexpr const char *wallets            = "wallets";
             constexpr const char *transactions       = "transactions";
             constexpr const char *transactions_state = "transactions_state";
+            constexpr const char *transactions_processing = "transactions_processing";
         }
 
         namespace index {
