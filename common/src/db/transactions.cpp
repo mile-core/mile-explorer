@@ -13,41 +13,14 @@
 using namespace milecsa::explorer;
 using namespace std;
 
-static bool first_time_update = true;
-
-auto udpate_state = [](Db *db){
-
-    uint64_t last_count = db::Table::Open(*db, table::name::transactions)
-            ->cursor()
-            .count()
-            .get_data();
-
-    db::Data state = {
-            {"id", "state"},
-            {"count", last_count}
-    };
-
-    db::Table::Open(*db, table::name::transactions_state)->update(state);
-
-    if (first_time_update)
-        Db::log->info("Processing: transactions_state has ben updated, count: {}", last_count);
-    else
-        Db::log->info("Processing: transactions_state count: {}", last_count);
-
-    first_time_update = false;
-};
-
 void Db::block_changes(const db::Data &block, uint256_t id) {
 
     try {
-
         db::Data trx = block.at("transactions");
         Db::log->trace("Db: get transactions {}... {} ", db_name_.c_str(), trx.dump());
 
         if (trx.is_array()) {
             add_transactions(trx, id);
-        }else  if (first_time_update){
-            udpate_state(this);
         }
     }
     catch (db::Timeout &e) {
@@ -88,14 +61,17 @@ inline map<string,string> find_public_keys(const db::Data &trx) {
     return ret;
 }
 
-void Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_id){
+uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_id) { //, uint64_t idx){
 
     std::string id = UInt256ToDecString(block_id);
 
     db::Data trx = input_trx;
 
+    uint64_t count = 0;
+
     for(const auto &entry: find_public_keys(trx)) {
 
+        trx["serial"] = -1;
         trx["id"] = entry.second;
         trx["block-id"] = std::stoull(id);
 
@@ -110,7 +86,11 @@ void Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_id){
 
         db::Table::Open(*this, table::name::transactions)->insert(trx);
         Db::log->trace("Processing: stream transactions {}", trx.dump());
+
+        count ++;
     }
+
+    return count;
 }
 
 void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
@@ -145,20 +125,19 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
 
 void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
 
-    if (first_time_update){
-        udpate_state(this);
-    }
+   // transactions_queue_.async([=]{
 
-    if(transactions.is_array()) {
-        uint64_t count = 0 ;
-        for ( auto trx: transactions ) {
-            add_stream_transaction(trx, block_id);
-            add_wallet_transaction(trx, block_id);
-            count++;
+        if(transactions.is_array()) {
+
+            auto thread_id = std::this_thread::get_id();
+
+            uint64_t count = 0 ;
+            for ( auto trx: transactions ) {
+                count += add_stream_transaction(trx, block_id);
+                add_wallet_transaction(trx, block_id);
+            }
+
+            Db::log->info("Processing: {} transactions are processed", count);
         }
-
-        udpate_state(this);
-
-        Db::log->info("Processing: {} transactions are processed", count);
-    }
+    //});
 }

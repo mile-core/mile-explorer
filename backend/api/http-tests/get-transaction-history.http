@@ -2,6 +2,6 @@ POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
-{"jsonrpc":"2.0","method":"get-transaction-history","params":{"first": 10001, "limit": 1},"id":"1"}
+{"jsonrpc":"2.0","method":"get-transaction-history","params":{"first": 39, "limit": 100},"id":"1"}
 
 ###

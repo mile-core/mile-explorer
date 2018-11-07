@@ -122,6 +122,23 @@ db::Cursor db::Cursor::between(uint64_t first_id, uint64_t limit, const string &
     return db::Cursor();
 }
 
+//template <typename T>
+//db::Cursor db::Cursor::filter(const string &index, T value) const {
+//    try {
+//
+//        auto result = cursor_
+//                .filter(db::Driver::optargs(index, value));
+//
+//        return  db::Cursor(
+//                result,
+//                std::move(db_));
+//    }
+//    catch (db::Error &e) {
+//        Db::err->error("Table: {} error slice: {}", db_->get_name(), e.message);
+//    }
+//    return db::Cursor();
+//}
+
 db::Cursor db::Cursor::sort(const string &index)const {
     try {
 

@@ -13,6 +13,9 @@
 using namespace milecsa::explorer;
 using namespace std;
 
+//dispatch::Queue Db::transactions_queue_ = dispatch::Queue(1);
+dispatch::Queue Db::transactions_update_index_queue_ = dispatch::Queue(1);
+
 optional<Db> Db::Open(const std::string &db_name, const std::string &host, int port) {
     try {
         auto connection = db::Driver::connect(host, port);
@@ -124,6 +127,55 @@ bool Db::init() {
     }
 
     Db::log->info("Db: {} is opened ...", db_name_.c_str());
+
+    transactions_update_index_queue_.async([&]{
+
+        while (transactions_update_index_queue_.is_running()) {
+
+            try{
+
+                auto update_state = [](Db *db, uint64_t count){
+                    db::Data state = {
+                            {"id", "state"},
+                            {"count", count}
+                    };
+                    db::Table::Open(*db, table::name::transactions_state)->update(state);
+                };
+
+
+                db::Data items = open_table(table::name::transactions)
+                        ->cursor()
+                        .sort("block-id")
+                        .filter("serial", -1).get_data();
+
+                uint64_t last_count = 0 ;
+
+                try {
+                    last_count = get_transaction_history_state();
+                }
+                catch(...){
+                    update_state(this, 0);
+                }
+
+                Db::log->info("Processing: last transaction serial number : {} ", last_count);
+
+                for (auto item: items) {
+                    item["serial"] = last_count++;
+                    open_table(table::name::transactions)->update(item);
+                }
+
+                update_state(this, last_count);
+
+                Db::log->info("Db: {} transactions update index processing started ...", db_name_.c_str());
+            }
+            catch (db::Error &e) {
+                Db::err->error("Db: {} error transactions update index {}", db_name_.c_str(), e.message);
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(config::update_timeout));
+        }
+
+    });
 
     return init_db;
 }

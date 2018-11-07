@@ -131,8 +131,8 @@ uint64_t Db::get_transaction_history_state() const {
 db::Data Db::get_transaction_history(uint64_t first_id, uint64_t limit) const {
     return db::Table::Open(*this, table::name::transactions)
             ->cursor()
-            .sort("block-id")
-            .slice(first_id, limit)
+            //.sort("block-id")
+            .between(first_id, limit, "serial")
             .get_data();
 }
 

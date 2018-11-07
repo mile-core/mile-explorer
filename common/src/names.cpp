@@ -26,7 +26,8 @@ namespace milecsa::explorer::table {
                 {name::blocks, "block-id"},
                 {name::blockchain_state, "block-id"},
                 {name::node_states, "block-id"},
-                {name::transactions, "block-id"}
+                {name::transactions, "block-id"},
+                {name::transactions, "serial"}
         };
         return indices;
     }
