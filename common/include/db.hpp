@@ -15,6 +15,7 @@
 #include <milecsa_jsonrpc.hpp>
 
 #include <rethinkdb.h>
+#include <milecsa_queue.h>
 
 #include "logger.hpp"
 #include "config.hpp"
@@ -90,6 +91,8 @@ namespace milecsa::explorer{
          * @return table object
          */
         Db::Table open_table(const std::string &name);
+
+        void delete_table(const std::string &name);
 
         /**
          * Db name
@@ -167,6 +170,7 @@ namespace milecsa::explorer{
         db::Data get_transaction_history(uint64_t first_id, uint64_t limit) const;
         db::Data get_transaction_by_id(const string &id) const;
 
+
     protected:
         const db::Connection get_connection() const;
 
@@ -175,8 +179,10 @@ namespace milecsa::explorer{
         Db(const std::string &db_name, const std::string &ip, unsigned short port, bool exists);
 
         void block_changes(const db::Data &block, uint256_t id);
-        void add_stream_transaction(const db::Data &transactions, uint256_t block_id);
+
+        uint64_t add_stream_transaction(const db::Data &imput_trx, uint256_t block_id, db::Data &output_trx);//, uint64_t idx);
         void add_wallet_transaction(const db::Data &transactions, uint256_t block_id);
+
         db::Result query() const {return db::Driver::db(db_name_);};
 
         std::string    host_;
@@ -185,5 +191,9 @@ namespace milecsa::explorer{
         uint256_t last_block_id_;
 
         bool exists_;
+
+        static dispatch::Queue transactions_queue_;
+        static dispatch::Queue transactions_update_index_queue_;
+
     };
 }
