@@ -13,8 +13,8 @@
 using namespace milecsa::explorer;
 using namespace std;
 
-//dispatch::Queue Db::transactions_queue_ = dispatch::Queue(1);
 dispatch::Queue Db::transactions_update_index_queue_ = dispatch::Queue(1);
+dispatch::Queue Db::transactions_queue_ = dispatch::Queue(8);
 
 optional<Db> Db::Open(const std::string &db_name, const std::string &host, int port) {
     try {
@@ -86,6 +86,16 @@ Db::Table Db::create_table(const std::string &name) {
     }
 }
 
+void Db::delete_table(const std::string &name) {
+    try {
+        auto connection = get_connection();
+        query().table_drop(name).run(*connection);
+    }
+    catch (db::Error &e) {
+        Db::err->error("Db: {} delete_table {} error {}", db_name_.c_str(), name, e.message);
+    }
+}
+
 Db::Table Db::open_table(const std::string &name) {
     return db::Table::Open(*this, name);
 }
@@ -130,23 +140,27 @@ bool Db::init() {
 
     transactions_update_index_queue_.async([&]{
 
+        dispatch::Queue update_stream_q(8);
+
         while (transactions_update_index_queue_.is_running()) {
+
+            std::this_thread::sleep_for(std::chrono::seconds(config::update_timeout));
 
             try{
 
-                auto update_state = [](Db *db, uint64_t count){
+                auto update_state = [=](Db *db, uint64_t count, uint64_t block_id){
                     db::Data state = {
                             {"id", "state"},
-                            {"count", count}
+                            {"count", count},
+                            {"block-id", block_id}
                     };
-                    db::Table::Open(*db, table::name::transactions_state)->update(state);
+                    open_table(table::name::transactions_state)->update(state);
                 };
 
-
-                db::Data items = open_table(table::name::transactions)
+                db::Data items = open_table(table::name::transactions_processing)
                         ->cursor()
                         .sort("block-id")
-                        .filter("serial", -1).get_data();
+                        .get_data();
 
                 uint64_t last_count = 0 ;
 
@@ -154,27 +168,50 @@ bool Db::init() {
                     last_count = get_transaction_history_state();
                 }
                 catch(...){
-                    update_state(this, 0);
+                    update_state(this, 0, 0);
                 }
 
-                Db::log->info("Processing: last transaction serial number : {} ", last_count);
+                uint64_t count = 0;
+                for (auto &item: items) {
 
-                for (auto item: items) {
+                    std::string trxid = item["id"];
+
+                    db::Data row = db::Table::Open(*this, table::name::transactions)
+                            ->cursor().get(trxid).get_data();
+
+                    if (row.count("id")>0) {
+                        Db::log->info("Processing: transaction {} already is in table {}", trxid, row.dump());
+                        open_table(table::name::transactions_processing)->cursor().remove(trxid);
+                        continue;
+                    }
+
                     item["serial"] = last_count++;
-                    open_table(table::name::transactions)->update(item);
+
+                    update_stream_q.async([=]{
+                        open_table(table::name::transactions)->insert(item);
+
+                        uint64_t bid = item["block-id"];
+
+                        update_state(this, last_count, bid);
+
+                        open_table(table::name::transactions_processing)->cursor().remove(trxid);
+
+                        Db::log->trace("Db: {} transaction serial number updated: {}, block-id: {}",
+                                db_name_.c_str(), last_count, bid);
+                    });
+
+                    count++;
                 }
 
-                update_state(this, last_count);
-
-                Db::log->info("Db: {} transactions update index processing started ...", db_name_.c_str());
+                Db::log->debug("Db: {} transactions are updated: {}", db_name_.c_str(), count);
             }
             catch (db::Error &e) {
                 Db::err->error("Db: {} error transactions update index {}", db_name_.c_str(), e.message);
             }
-
-            std::this_thread::sleep_for(std::chrono::seconds(config::update_timeout));
+            catch (...) {
+                Db::err->error("Db: transactions updating index unknown error ... ");
+            }
         }
-
     });
 
     return init_db;

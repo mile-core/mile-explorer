@@ -21,6 +21,13 @@ void Db::add_block(const db::Data &_block, uint256_t block_id) {
         db::Data block = _block;
 
         {
+            db::Data row = db::Table::Open(*this, table::name::blocks)
+                    ->cursor().get(id).get_data();
+
+            if (row.count("id")>0){
+                Db::log->trace("Processing: block {} already is in table",  id);
+            }
+
             block["block-id"] = std::stoull(id);
             db::Table::Open(*this, table::name::blocks)->insert(block);
 

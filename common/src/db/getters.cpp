@@ -15,14 +15,14 @@ using namespace std;
 
 uint256_t Db::get_last_block_id() const {
     try {
-        auto connection = get_connection();
 
-        auto cursor = query()
-                .table(table::name::blockchain_state)
-                .max(db::Driver::optargs("index", "block-id"))["block-id"]
-                .run(*connection);
+        auto id =  db::Table::Open(*this, table::name::transactions_state)
+                ->cursor()
+                .get("state")
+                .field("block-id")
+                .get_number();
 
-        return static_cast<uint256_t>((*cursor.to_datum().get_number()));
+        return static_cast<uint256_t>(id);
 
     } catch (db::Error &e) {
         Db::err->error("Db: {} error reading last block id {}", db_name_.c_str(), e.message);
@@ -105,9 +105,10 @@ db::Data Db::get_wallet_history_blocks(const string &public_key, uint64_t first_
     return db::Table::Open(*this, table::name::wallets)
             ->cursor()
             .get(public_key)
-            .field("blocks")
+            .field("transactions")
+            .sort_field("block-id")
+            .field("block-id")
             .slice(first_id, limit)
-            //.field("block-id")
             .get_data();
 }
 
@@ -131,7 +132,6 @@ uint64_t Db::get_transaction_history_state() const {
 db::Data Db::get_transaction_history(uint64_t first_id, uint64_t limit) const {
     return db::Table::Open(*this, table::name::transactions)
             ->cursor()
-            //.sort("block-id")
             .between(first_id, limit, "serial")
             .get_data();
 }

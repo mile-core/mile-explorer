@@ -16,7 +16,7 @@ using namespace std;
 db::Data db::Cursor::get_data()  {
     try {
 
-        if (!db_) db::Data::array();
+        if (!db_) return db::Data::array();
 
         auto connection = db_->get_connection();
 
@@ -36,9 +36,33 @@ db::Data db::Cursor::get_data()  {
         return data;
     }
     catch (db::Error &e) {
-        Db::err->error("Table: {} error get_data: {}", db_->get_name(), e.message);
+        Db::err->warn("Table: {} error get_data: {}", db_->get_name(), e.message);
     }
     return db::Data::array();
+}
+
+
+double db::Cursor::get_number()  {
+    try {
+
+        if (!db_) return 0;
+
+        auto connection = db_->get_connection();
+
+        auto result = cursor_.run(*connection);
+
+        auto object = result.to_datum();
+
+        if (object.is_number()) {
+            return *object.get_number();
+        }
+
+        return 0;
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error get_data: {}", db_->get_name(), e.message);
+    }
+    return 0;
 }
 
 db::Cursor db::Cursor::max(const string &id) const {
@@ -61,6 +85,36 @@ db::Cursor db::Cursor::get(const string &id)const {
     }
     catch (db::Error &e) {
         Db::err->error("Table: {} error get({}): {}", db_->get_name(), id, e.message);
+    }
+    return db::Cursor();
+}
+
+db::Cursor db::Cursor::remove(const string &id) {
+    try {
+        auto connection = db_->get_connection();
+
+        auto r = cursor_.get(id);
+        r.delete_().run(*connection);
+        return  db::Cursor(
+                r,
+                std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} remove {}: {}", db_->get_name(), id, e.message);
+    }
+    return db::Cursor();
+}
+
+db::Cursor db::Cursor::remove() {
+    try {
+        auto connection = db_->get_connection();
+        cursor_.delete_().run(*connection);
+        return  db::Cursor(
+                cursor_,
+                std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} remove: {}", db_->get_name(), e.message);
     }
     return db::Cursor();
 }
@@ -122,27 +176,25 @@ db::Cursor db::Cursor::between(uint64_t first_id, uint64_t limit, const string &
     return db::Cursor();
 }
 
-//template <typename T>
-//db::Cursor db::Cursor::filter(const string &index, T value) const {
-//    try {
-//
-//        auto result = cursor_
-//                .filter(db::Driver::optargs(index, value));
-//
-//        return  db::Cursor(
-//                result,
-//                std::move(db_));
-//    }
-//    catch (db::Error &e) {
-//        Db::err->error("Table: {} error slice: {}", db_->get_name(), e.message);
-//    }
-//    return db::Cursor();
-//}
-
 db::Cursor db::Cursor::sort(const string &index)const {
     try {
 
         auto result = cursor_.order_by(db::Driver::optargs("index", index));
+
+        return  db::Cursor(
+                result,
+                std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error sort: {}", db_->get_name(), e.message);
+    }
+    return db::Cursor();
+}
+
+db::Cursor db::Cursor::sort_field(const string &index)const {
+    try {
+
+        auto result = cursor_.order_by(index);
 
         return  db::Cursor(
                 result,

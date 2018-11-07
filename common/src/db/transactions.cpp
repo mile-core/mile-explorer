@@ -61,7 +61,7 @@ inline map<string,string> find_public_keys(const db::Data &trx) {
     return ret;
 }
 
-uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_id) { //, uint64_t idx){
+uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_id, db::Data &output_trx) { //, uint64_t idx){
 
     std::string id = UInt256ToDecString(block_id);
 
@@ -71,8 +71,18 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_i
 
     for(const auto &entry: find_public_keys(trx)) {
 
-        trx["serial"] = -1;
-        trx["id"] = entry.second;
+        std::string pk = entry.second;
+
+        db::Data row = db::Table::Open(*this, table::name::transactions_processing)
+                ->cursor().get(id).get_data();
+
+        if (row.count("id")>0) {
+            Db::log->trace("Processing: stream transaction already is in table {}", row.dump());
+            continue;
+        }
+
+        //trx["serial"] = -1;
+        trx["id"] = pk;
         trx["block-id"] = std::stoull(id);
 
         if (trx["transaction-id"].is_string()){
@@ -84,7 +94,10 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_i
             replace_keys(from, to, trx);
         }
 
-        db::Table::Open(*this, table::name::transactions)->insert(trx);
+        //db::Table::Open(*this, table::name::transactions_processing)->insert(trx);
+
+        output_trx.push_back(trx);
+
         Db::log->trace("Processing: stream transactions {}", trx.dump());
 
         count ++;
@@ -125,19 +138,21 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
 
 void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
 
-   // transactions_queue_.async([=]{
+    if(transactions.is_array()) {
 
-        if(transactions.is_array()) {
-
-            auto thread_id = std::this_thread::get_id();
-
-            uint64_t count = 0 ;
-            for ( auto trx: transactions ) {
-                count += add_stream_transaction(trx, block_id);
+        uint64_t count = 0 ;
+        db::Data stream;
+        for ( auto trx: transactions ) {
+            count += add_stream_transaction(trx, block_id, stream);
+            transactions_queue_.async([=] {
                 add_wallet_transaction(trx, block_id);
-            }
-
-            Db::log->info("Processing: {} transactions are processed", count);
+            });
         }
-    //});
+
+        transactions_queue_.async([=] {
+            db::Table::Open(*this, table::name::transactions_processing)->insert(stream);
+        });
+
+        Db::log->info("Processing: {} transactions are processed, block-id: {}", count, UInt256ToDecString(block_id));
+    }
 }

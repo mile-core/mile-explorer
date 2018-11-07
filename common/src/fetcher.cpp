@@ -56,7 +56,7 @@ Fetcher::Fetcher(
          db_(db),
          main_fetching_task_(new Task("main-task", config::rpc_queue_size)),
          block_fetcher_task_(new Task("block-fetcher", config::block_processin_queue_size)),
-         block_processing_task_(new Task("block-processing", 1)),  // 1 db connection at time
+         block_processing_task_(new Task("block-processing", config::block_processin_queue_size)),
          rpc_fetching_block_task_(new Task("rpc-fetching-block", config::rpc_queue_size)),
          utility_task_(new Task("utility-processing", 2))
 {

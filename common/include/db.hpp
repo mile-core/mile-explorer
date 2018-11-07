@@ -92,6 +92,8 @@ namespace milecsa::explorer{
          */
         Db::Table open_table(const std::string &name);
 
+        void delete_table(const std::string &name);
+
         /**
          * Db name
          * @return string
@@ -178,8 +180,7 @@ namespace milecsa::explorer{
 
         void block_changes(const db::Data &block, uint256_t id);
 
-        uint64_t add_stream_transaction(const db::Data &transactions, uint256_t block_id);//, uint64_t idx);
-
+        uint64_t add_stream_transaction(const db::Data &imput_trx, uint256_t block_id, db::Data &output_trx);//, uint64_t idx);
         void add_wallet_transaction(const db::Data &transactions, uint256_t block_id);
 
         db::Result query() const {return db::Driver::db(db_name_);};
@@ -191,7 +192,7 @@ namespace milecsa::explorer{
 
         bool exists_;
 
-        //static dispatch::Queue transactions_queue_;
+        static dispatch::Queue transactions_queue_;
         static dispatch::Queue transactions_update_index_queue_;
 
     };
