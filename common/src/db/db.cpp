@@ -14,7 +14,7 @@ using namespace milecsa::explorer;
 using namespace std;
 
 dispatch::Queue Db::transactions_update_index_queue_ = dispatch::Queue(1);
-dispatch::Queue Db::transactions_queue_ = dispatch::Queue(8);
+dispatch::Queue Db::transactions_queue_ = dispatch::Queue(config::block_processin_queue_size);
 
 optional<Db> Db::Open(const std::string &db_name, const std::string &host, int port) {
     try {
@@ -142,6 +142,8 @@ bool Db::init() {
 
         dispatch::Queue update_stream_q(8);
 
+        uint64_t prev_bid = 0;
+
         while (transactions_update_index_queue_.is_running()) {
 
             std::this_thread::sleep_for(std::chrono::seconds(config::update_timeout));
@@ -172,15 +174,34 @@ bool Db::init() {
                 }
 
                 uint64_t count = 0;
+
                 for (auto &item: items) {
 
+                    uint64_t    bid   = item["block-id"];
                     std::string trxid = item["id"];
+
+                    if (prev_bid>0) {
+
+                        if (item.at("transaction-type") == "__processing__") {
+                            Db::log->debug("Processing: transaction {} processing type, will be skipped", trxid);
+                            prev_bid = bid;
+                            open_table(table::name::transactions_processing)->cursor().remove(trxid);
+                            continue;
+                        }
+                        if ((bid-prev_bid)>1) {
+                            Db::log->debug("Processing: transaction {} is in a forward block {} while current is {}", trxid, bid, prev_bid);
+                            prev_bid = bid;
+                            break;
+                        }
+                    }
+
+                    prev_bid = bid;
 
                     db::Data row = db::Table::Open(*this, table::name::transactions)
                             ->cursor().get(trxid).get_data();
 
                     if (row.count("id")>0) {
-                        Db::log->info("Processing: transaction {} already is in table {}", trxid, row.dump());
+                        Db::log->trace("Processing: transaction {} already is in table {}", trxid, row.dump());
                         open_table(table::name::transactions_processing)->cursor().remove(trxid);
                         continue;
                     }
@@ -189,8 +210,6 @@ bool Db::init() {
 
                     update_stream_q.async([=]{
                         open_table(table::name::transactions)->insert(item);
-
-                        uint64_t bid = item["block-id"];
 
                         update_state(this, last_count, bid);
 
@@ -202,8 +221,8 @@ bool Db::init() {
 
                     count++;
                 }
-
-                Db::log->debug("Db: {} transactions are updated: {}", db_name_.c_str(), count);
+                if (count>0)
+                    Db::log->debug("Db: {} transactions are updated: {}", db_name_.c_str(), count);
             }
             catch (db::Error &e) {
                 Db::err->error("Db: {} error transactions update index {}", db_name_.c_str(), e.message);

@@ -19,9 +19,8 @@ void Db::block_changes(const db::Data &block, uint256_t id) {
         db::Data trx = block.at("transactions");
         Db::log->trace("Db: get transactions {}... {} ", db_name_.c_str(), trx.dump());
 
-        if (trx.is_array()) {
-            add_transactions(trx, id);
-        }
+        add_transactions(trx, id);
+
     }
     catch (db::Timeout &e) {
         Db::err->warn("Db: {} timeout get changes {}", db_name_.c_str(), e.what());
@@ -81,7 +80,6 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_i
             continue;
         }
 
-        //trx["serial"] = -1;
         trx["id"] = pk;
         trx["block-id"] = std::stoull(id);
 
@@ -93,8 +91,6 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_i
         for (const auto &[from, to]: table::get_replacement_keys()) {
             replace_keys(from, to, trx);
         }
-
-        //db::Table::Open(*this, table::name::transactions_processing)->insert(trx);
 
         output_trx.push_back(trx);
 
@@ -139,20 +135,34 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
 void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
 
     if(transactions.is_array()) {
-
-        uint64_t count = 0 ;
-        db::Data stream;
-        for ( auto trx: transactions ) {
-            count += add_stream_transaction(trx, block_id, stream);
-            transactions_queue_.async([=] {
-                add_wallet_transaction(trx, block_id);
-            });
-        }
-
         transactions_queue_.async([=] {
-            db::Table::Open(*this, table::name::transactions_processing)->insert(stream);
-        });
 
-        Db::log->info("Processing: {} transactions are processed, block-id: {}", count, UInt256ToDecString(block_id));
+            uint64_t count = 0 ;
+
+            db::Data stream;
+
+            for ( auto trx: transactions ) {
+                count += add_stream_transaction(trx, block_id, stream);
+                add_wallet_transaction(trx, block_id);
+            }
+
+            db::Table::Open(*this, table::name::transactions_processing)->insert(stream);
+
+            Db::log->info("Processing: {} transactions are processed, block-id: {}", count, UInt256ToDecString(block_id));
+        });
+    }
+    else {
+
+        db::Data stream;
+        std::string id = UInt256ToDecString(block_id);
+        auto _block_id = std::stoull(id);
+
+        stream["id"] = id;
+        stream["block-id"] = std::stoull(id);
+        stream["transaction-type"] = "__processing__";
+
+        db::Table::Open(*this, table::name::transactions_processing)->insert(stream);
+
+        Db::log->trace("Processing: block-id: {} is empty", id);
     }
 }
