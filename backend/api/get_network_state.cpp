@@ -10,4 +10,4 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result["nodes"]["first"] = 0;
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("get-network-state",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("get-network-state",method,"{}");

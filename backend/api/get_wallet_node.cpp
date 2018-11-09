@@ -15,4 +15,4 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result = db->get_wallet_node(public_key);
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("get-wallet-node",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("get-wallet-node",method,"{public-key: 'xxxxxx'}");

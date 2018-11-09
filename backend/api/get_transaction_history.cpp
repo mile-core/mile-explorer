@@ -17,4 +17,4 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result = db->get_transaction_history(first_id,limit);
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("get-transaction-history",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("get-transaction-history",method,"{first:0, limit:42}");

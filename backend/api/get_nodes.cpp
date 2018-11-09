@@ -16,4 +16,4 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result = db->get_nodes(first_id, limit);
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("get-nodes",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("get-nodes",method,"{first: 0, limit:42}");

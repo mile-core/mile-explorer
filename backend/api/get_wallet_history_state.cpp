@@ -26,4 +26,4 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result["transaction"] = trx;
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("get-wallet-history-state",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("get-wallet-history-state",method,"{}");

@@ -13,10 +13,19 @@
 using namespace milecsa::explorer;
 using namespace std;
 
+void Db::update_info(const milecsa::explorer::db::Data &blockchain_info) {
+    db::Data info = {
+            {"info", blockchain_info},
+            {"id", blockchain_info["version"]}
+    };
+    db::Table::Open(*this, table::name::blockchain_info)->insert(info);
+    Db::log->info("Db: {} blockchain info snapshot: ", db_name_, info.dump());
+}
+
 void Db::add_node_states(const db::Data &nodes_state, uint256_t block_id){
     std::string id = UInt256ToDecString(block_id);
 
-    Db::log->debug("Db: ... check node states for block-id: {}", id);
+    Db::log->debug("Db: {} check node states for block-id: {}", db_name_, id);
 
     db::Data states = {
             {"nodes", nodes_state},
@@ -24,7 +33,8 @@ void Db::add_node_states(const db::Data &nodes_state, uint256_t block_id){
     };
 
     db::Table::Open(*this, table::name::node_states)->insert(states);
-    Db::log->trace("Db: ... node states: {} block id {}", states.dump(), id);
+
+    Db::log->trace("Db: {} node states: {} block id {}", db_name_, states.dump(), id);
 
     for (auto &item: nodes_state) {
         std::string pid = item["public-key"];
@@ -39,7 +49,7 @@ void Db::add_node_states(const db::Data &nodes_state, uint256_t block_id){
 
         db::Table::Open(*this, table::name::node_wallets)->update(node);
 
-        Db::log->trace("Db: ... node wallet[{}]: {}", pid, node.dump());
+        Db::log->trace("Db: {} node wallet[{}]: {}", db_name_, pid, node.dump());
     }
 
 }

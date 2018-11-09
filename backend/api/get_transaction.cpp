@@ -19,10 +19,21 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
         id = public_key.append(":").append(std::to_string(param.get<std::uint64_t>()));
     }
     else {
-        id = param.get<std::string>();
+        if (ctx.request.params.count(api::params::public_key)){
+            auto public_key = ctx.request.params.at(api::params::public_key).get<std::string>();
+            id = public_key.append(":");
+            if (param.is_number())
+                id = id.append(std::to_string(param.get<std::uint64_t>()));
+            else {
+                id = id.append(param.get<std::string>());
+            }
+        }
+        else {
+            id = param.get<std::string>();
+        }
     }
 
     ctx.response.result = db->get_transaction_by_id(id);
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("get-transaction",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("get-transaction",method,"{id: 'xxxxxxx:0000000'} or {id:0, public-key: 'xxxxxxx'");

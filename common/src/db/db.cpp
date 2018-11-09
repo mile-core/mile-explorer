@@ -183,7 +183,7 @@ bool Db::init() {
                     if (prev_bid>0) {
 
                         if (item.at("transaction-type") == "__processing__") {
-                            Db::log->debug("Processing: transaction {} processing type, will be skipped", trxid);
+                            Db::log->trace("Processing: transaction {} processing type, will be skipped", trxid);
                             prev_bid = bid;
                             open_table(table::name::transactions_processing)->cursor().remove(trxid);
                             continue;
@@ -222,7 +222,7 @@ bool Db::init() {
                     count++;
                 }
                 if (count>0)
-                    Db::log->debug("Db: {} transactions are updated: {}", db_name_.c_str(), count);
+                    Db::log->info("Db: {} transactions are updated: {}", db_name_.c_str(), count);
             }
             catch (db::Error &e) {
                 Db::err->error("Db: {} error transactions update index {}", db_name_.c_str(), e.message);

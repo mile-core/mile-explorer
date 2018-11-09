@@ -85,7 +85,10 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_i
 
         if (trx["transaction-id"].is_string()){
             string trx_it = trx["transaction-id"];
-            trx["transaction-id"] = std::stoull(trx_it);
+            trx["transaction-id"] = trx["transaction-id"];
+        }
+        else if (trx["transaction-id"].is_number()) {
+            trx["transaction-id"] = trx["transaction-id"].dump();
         }
 
         for (const auto &[from, to]: table::get_replacement_keys()) {
@@ -115,7 +118,7 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
         db::Data transaction_raw = {
                 {"id",   entry.second},
                 {"block-id",   _block_id},
-                {"transaction-type", trx["transaction-name"]}
+                {"transaction-type", trx["transaction-type"]}
         };
 
         db::Data transactions_col;

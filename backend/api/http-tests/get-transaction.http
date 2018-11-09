@@ -4,6 +4,10 @@ Cache-Control: no-cache
 
 {"jsonrpc":"2.0","method":"get-transaction","params":{"id": "2mMN2bHqSm8WTuY3gB9UXDJsKnuZKKyDTpXg1MF4qxZTEsLHr3:1868714531"},"id":"1"}
 
-#{"jsonrpc":"2.0","method":"get-transaction","params":{"id": 739482770, "public-key": "vToaqhD7SNb1cDffBWucNFa8KjGgk7ZqoAQRe3YnDR6tDhLJz"},"id":"1"}
+#{"jsonrpc":"2.0","method":"get-transaction","params":{"id": 1868714531, "public-key": "2mMN2bHqSm8WTuY3gB9UXDJsKnuZKKyDTpXg1MF4qxZTEsLHr3"},"id":"1"}
+
+#{"jsonrpc":"2.0","method":"get-transaction","params":{"id": "1868714531", "public-key": "2mMN2bHqSm8WTuY3gB9UXDJsKnuZKKyDTpXg1MF4qxZTEsLHr3"},"id":"1"}
+
+#{"jsonrpc":"2.0","method":"get-transaction","params":{"id": 1868714531},"id":"1"}
 
 ###
