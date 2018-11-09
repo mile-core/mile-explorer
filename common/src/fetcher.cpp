@@ -154,18 +154,12 @@ void Fetcher::fetch_blocks(uint256_t from, uint256_t to) {
 
                     response = client->get_block(i);
 
-                    if (response->count("result")==0){
-                        Fetcher::err->warn("Fetcher: block getting nothing result, retrying");
-                        std::this_thread::sleep_for(std::chrono::seconds(1));
-                        continue;
-                    }
-
-                    if (response->at("result").count("block-data")==0){
+                    if (response->count("block-data")==0){
                         Fetcher::err->warn("Fetcher: block getting not data, retrying");
                         continue;
                     }
 
-                    block = response->at("result")["block-data"];
+                    block = response->at("block-data");
 
                 }
                 catch (std::exception &e) {
@@ -202,30 +196,50 @@ void Fetcher::fetch_states(){
 
     uint256_t block_id = 0;
 
+    bool bch_info_got = false;
+
     while(utility_task_->is_running()) {
 
-        auto client = this->get_rpc();
+        try {
+            auto client = this->get_rpc();
 
-        if (!client){
-            Logger::err->warn("Fetcher: utility request failed, retrying");
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            continue;
+            if (!client){
+                Logger::err->warn("Fetcher: utility request failed, retrying");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                continue;
+            }
+
+            if (!bch_info_got) {
+                if (auto info = client->get_blockchain_info()){
+                    this->get_db()->update_info(*info);
+                    bch_info_got = true;
+                }
+            }
+
+            optional<uint256_t> next_block_id = client->get_current_block_id();
+
+            if (!next_block_id)
+                continue;
+
+            auto nodes = client->get_nodes();
+
+            if(!nodes || *next_block_id<=block_id)
+                continue;
+
+            block_id = *next_block_id;
+
+            if(!nodes->empty()){
+                this->get_db()->add_node_states(*nodes, block_id);
+            }
+
         }
-
-        optional<uint256_t> next_block_id = client->get_current_block_id();
-
-        if (!next_block_id)
-            continue;
-
-        auto nodes = client->get_nodes();
-
-        if(!nodes || *next_block_id<=block_id)
-            continue;
-
-        block_id = *next_block_id;
-
-        if(nodes->count("result")>0){
-            this->get_db()->add_node_states(nodes->at("result"), block_id);
+        catch (std::exception &e) {
+            Fetcher::err->error("Fetcher: {} error fetching network meta data: {}", " = ", e.what());
+            std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
+        }
+        catch (...) {
+            Fetcher::err->error("Fetcher: something wrong ...");
+            std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(this->update_timeout_));

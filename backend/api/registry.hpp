@@ -48,12 +48,23 @@ namespace milecsa::rpc::server {
         }
 
         template <typename F>
-        bool add(std::string name, F&&f){
-            storage_.emplace(std::move(name), std::forward<F>(f));
+        bool add(std::string name, F&&f, std::string params){
+            storage_.emplace(name, std::forward<F>(f));
+            try {
+                params_.emplace(name, params);
+            }
+            catch (nlohmann::json::parse_error &e){
+                if(error_handler_) {
+                    std::cerr << "rpc::Regestry error: " <<  e.what() << " in method: " << name << std::endl;
+                }
+            }
             return true;
         }
 
+        const explorer::db::Data &get_help() const { return params_; }
+
     private:
+        explorer::db::Data params_;
         server::RpcBase<boost::container::flat_map>::storage_type storage_;
         static std::optional<milecsa::ErrorHandler> error_handler_;
     };
@@ -70,4 +81,4 @@ using namespace std;
 using namespace milecsa::rpc;
 using ctxDb = std::optional<milecsa::explorer::Db>;
 
-#define MILECSA_JSONRPC_REGESTRY_METHOD(name,method) static auto v = milecsa::rpc::server::Registry::Instance().add((name),(method))
+#define MILECSA_JSONRPC_REGESTRY_METHOD(name, method, params) static auto v = milecsa::rpc::server::Registry::Instance().add((name),(method),(params))

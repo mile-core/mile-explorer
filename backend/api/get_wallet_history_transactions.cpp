@@ -19,4 +19,4 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result = db->get_wallet_history_transactions(public_key,first_id,limit);
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("get-wallet-history-transactions",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("get-wallet-history-transactions",method,"{first:0, limit:42}");

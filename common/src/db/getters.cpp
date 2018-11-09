@@ -38,6 +38,13 @@ db::Data Db::get_network_state() const {
             .get_data();
 }
 
+db::Data Db::get_blockchain_info() const {
+    return db::Table::Open(*this, table::name::blockchain_info)
+            ->cursor()
+            .max("id")
+            .get_data();
+}
+
 db::Data Db::get_nodes(uint64_t first_id, uint64_t limit) const {
 
     return db::Table::Open(*this, table::name::node_states)

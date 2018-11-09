@@ -108,6 +108,14 @@ namespace milecsa::explorer{
         void add_block(const db::Data &block, uint256_t id);
 
         /**
+         *
+         * Update blockchain info on indexer start
+         *
+         * @param blockchain_info
+         */
+        void update_info(const db::Data &blockchain_info);
+
+        /**
          * Add transactions from block
          * @param transactions - transactions array
          * @param block_id - block id
@@ -147,6 +155,8 @@ namespace milecsa::explorer{
          * @return
          */
         db::Data get_nodes(uint64_t first_id, uint64_t limit) const ;
+
+        db::Data get_blockchain_info() const ;
 
         db::Data get_block_history_state() const ;
         db::Data get_block_history(uint64_t first_id, uint64_t limit) const;

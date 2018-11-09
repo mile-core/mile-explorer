@@ -17,6 +17,7 @@ namespace milecsa::explorer{
     namespace table {
 
         namespace name {
+            constexpr const char *blockchain_info    = "blockchain_info";
             constexpr const char *blockchain_state   = "blockchain_state";
             constexpr const char *node_states        = "node_states";
             constexpr const char *node_wallets       = "node_wallets";

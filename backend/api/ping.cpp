@@ -8,4 +8,4 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result = true;
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("ping",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("ping",method,"{}");

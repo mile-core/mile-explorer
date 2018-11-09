@@ -59,7 +59,6 @@ db::Cursor db::Table::cursor() const {
 }
 
 void db::Table::insert(const milecsa::explorer::db::Data &data) {
-
     try{
         auto connection = db_->get_connection();
         db::Driver::Term q = db_->query();

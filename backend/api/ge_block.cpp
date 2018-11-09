@@ -14,4 +14,4 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result = db->get_block_by_id(block_id);
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("get-block",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("get-block",method,"{id:0} or {id:0}");

@@ -268,7 +268,7 @@ Cache-Control: no-cache
         "from": "25XmmZXDXbYrQMgSXQcCdcGvjec6iSR4hQ5AxfQJMC8NkMdGzZ",
         "id": "25XmmZXDXbYrQMgSXQcCdcGvjec6iSR4hQ5AxfQJMC8NkMdGzZ:10675441032758331955",
         "to": "2bTcCpZkXgtTcHokTH1iM8kwioVK85TdCwDvUH8c37g4CjiNti",
-        "transaction-id": 1.0675441032758331e+19,
+        "transaction-id": "10675441032758331955",
         "transaction-type": "TransferAssetsTransaction"
     }
 }

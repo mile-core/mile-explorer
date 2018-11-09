@@ -17,6 +17,7 @@
 static const nlohmann::json tests = R"([
   {"method": "help",                     "params": {} },
   {"method": "ping",                     "params": {} },
+  {"method": "get-blockchain-info",      "params": {} },
   {"method": "get-block-history-state",  "params": {} },
   {"method": "get-block-history",        "params": {"first":0, "limit":3}},
   {"method": "get-block",                "params": {"id":2}},
@@ -137,6 +138,11 @@ BOOST_FIXTURE_TEST_CASE( ping, SessionEval )
 BOOST_FIXTURE_TEST_CASE( help, SessionEval )
 {
     BOOST_CHECK(run_tests("help"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_blockchain_info, SessionEval )
+{
+    BOOST_CHECK(run_tests("get-blockchain-info"));
 }
 
 BOOST_FIXTURE_TEST_CASE( get_block_history_state, SessionEval )

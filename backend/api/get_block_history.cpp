@@ -20,4 +20,4 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
     ctx.response.result = db->get_block_history(first_id, limit);
 };
 
-MILECSA_JSONRPC_REGESTRY_METHOD("get-block-history",method);
+MILECSA_JSONRPC_REGESTRY_METHOD("get-block-history",method,"{first:0, limit:42}");
