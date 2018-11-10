@@ -47,6 +47,7 @@ namespace milecsa::explorer {
             double            get_number();
 
             Cursor max(const string &id)const;
+            Cursor min(const string &id)const;
             Cursor field(const string &field_name)const;
             Cursor get(const string &id)const;
             Cursor remove(const string &id);

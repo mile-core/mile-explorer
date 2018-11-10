@@ -10,6 +10,10 @@
 #include "table.hpp"
 #include "names.hpp"
 
+namespace milecsa::explorer::db {
+    void migration(optional<Db> db);
+}
+
 using namespace milecsa::explorer;
 using namespace std;
 
@@ -54,6 +58,37 @@ Db::Db(const std::string &db_name,
 
 Db::~Db(){}
 
+unsigned int Db::get_version() const {
+    try {
+        return open_table(table::name::meta)->cursor()
+                .get("version")
+                .field("current")
+                .get_number();
+    }
+    catch (db::Error & e)
+    {
+        Db::err->error("Db: {} get_version error {}", db_name_.c_str(), e.message);
+    }
+    return 0;
+}
+
+void Db::update_version(unsigned int version) {
+    try {
+
+        db::Data meta = {
+                {"id",        "version"},
+                {"current",   version},
+                {"previous",  get_version()},
+                {"timestamp", time(0)}
+        };
+        open_table(table::name::meta)->update(meta);
+    }
+    catch (db::Error & e)
+    {
+        Db::err->error("Db: {} update_version error {}", db_name_.c_str(), e.message);
+    }
+}
+
 const db::Connection Db::get_connection() const {
     db::Connection c = db::Driver::connect(host_, port_);
     return std::move(c);
@@ -96,7 +131,7 @@ void Db::delete_table(const std::string &name) {
     }
 }
 
-Db::Table Db::open_table(const std::string &name) {
+Db::Table Db::open_table(const std::string &name) const {
     return db::Table::Open(*this, name);
 }
 
@@ -131,12 +166,22 @@ bool Db::init() {
                 Db::err->error("Db: {} error reading last block id {}", db_name_.c_str(), e.message);
             }
         }
+
+        db::migration(*this);
+
+        Db::log->info("Db: {} is opened ...", db_name_.c_str());
+
+        transactions_processing();
+
     }
     catch (db::Error &e) {
         Db::err->error("Db: {} error initializing {}", db_name_.c_str(), e.message);
     }
 
-    Db::log->info("Db: {} is opened ...", db_name_.c_str());
+    return init_db;
+}
+
+void Db::transactions_processing() {
 
     transactions_update_index_queue_.async([&]{
 
@@ -216,7 +261,7 @@ bool Db::init() {
                         open_table(table::name::transactions_processing)->cursor().remove(trxid);
 
                         Db::log->trace("Db: {} transaction serial number updated: {}, block-id: {}",
-                                db_name_.c_str(), last_count, bid);
+                                       db_name_.c_str(), last_count, bid);
                     });
 
                     count++;
@@ -232,6 +277,4 @@ bool Db::init() {
             }
         }
     });
-
-    return init_db;
 }

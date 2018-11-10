@@ -1,0 +1,14 @@
+#ifndef MILE_EXPLORER_VERSION_CONFIG_H
+#define MILE_EXPLORER_VERSION_CONFIG_H
+
+inline static unsigned int indexerVersion()
+{
+    return @INDEXER_VERSION@;
+}
+
+inline static unsigned int explorerVersion()
+{
+    return @EXPLORER_VERSION@;
+}
+
+#endif // MILE_EXPLORER_VERSION_CONFIG_H

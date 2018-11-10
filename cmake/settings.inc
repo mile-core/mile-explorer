@@ -7,6 +7,7 @@ find_package (Boost REQUIRED COMPONENTS system)
 find_package(OpenSSL)
 
 include_directories(
+		${CMAKE_BINARY_DIR}/generated
         ../common/include
         ../vendor/librethinkdbxx/build/include/
         ../vendor/mile-csa-jsonrpc-client/include

@@ -130,14 +130,22 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
         };
 
         db::Table::Open(*this, table::name::wallets)->update(entry.first, query);
-
-        Db::log->trace("Processing: wallet transactions {}", transactions_col.dump());
     }
 }
 
 void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
 
     if(transactions.is_array()) {
+        transactions_queue_.async([=] {
+            uint64_t count = 0 ;
+            for ( auto trx: transactions ) {
+                add_wallet_transaction(trx, block_id);
+                count++ ;
+            }
+
+            Db::log->info("Processing: {} wallet transactions are processed", count);
+        });
+
         transactions_queue_.async([=] {
 
             uint64_t count = 0 ;
@@ -146,7 +154,6 @@ void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
 
             for ( auto trx: transactions ) {
                 count += add_stream_transaction(trx, block_id, stream);
-                add_wallet_transaction(trx, block_id);
             }
 
             db::Table::Open(*this, table::name::transactions_processing)->insert(stream);

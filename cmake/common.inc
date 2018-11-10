@@ -1,12 +1,6 @@
 include(${CMAKE_SOURCE_DIR}/cmake/settings.inc)
 
-file (GLOB COMMON_SRC ${COMMON_SRC}
-        ../common/src/*.cpp
-        ../common/src/db/*.cpp
-        )
-
-
-add_executable(${CURRENT_TARGET_NAME} main.cpp ${COMMON_SRC} ${EXT_SRC})
+add_executable(${CURRENT_TARGET_NAME} main.cpp ${EXT_SRC})
 
 target_link_libraries(
         ${CURRENT_TARGET_NAME}
@@ -14,6 +8,7 @@ target_link_libraries(
         ${Boost_LIBRARIES}
         ${OPENSSL_SSL_LIBRARY}
         ${OPENSSL_CRYPTO_LIBRARY}
+        mile-explorerdb
         milecsa_jsonrpc
         milecsa
         milecsa_dispatchq

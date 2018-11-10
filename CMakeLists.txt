@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
-project(mile-explorer)
+
+project(mile-explorer VERSION 1.2.2 LANGUAGES CXX)
+
+set(VERSION_FILE "version.txt")
+
+file(WRITE "${VERSION_FILE}" "${PROJECT_NAME} ${PROJECT_VERSION}")
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -41,8 +46,11 @@ find_package(${YAML_INCLUDE_DIR} REQUIRED PATHS ${yaml_path} )
 include_directories(SYSTEM vendor/yaml-cpp/include)
 
 add_subdirectory(vendor)
+
+add_subdirectory(common)
 add_subdirectory(indexer)
 add_subdirectory(backend)
+
 add_subdirectory(test)
 
 option(test "test" OFF)

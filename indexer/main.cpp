@@ -35,11 +35,16 @@ int main(int argc, char *argv[]) {
     if (!fetcher)
         exit(-1);
 
-    dispatch::Default::async([&]{
-        fetcher->run(db->get_start_block_id());
-    });
+    try {
+        dispatch::Default::async([&]{
+            fetcher->run(db->get_last_block_id());
+        });
 
-    dispatch::Default::loop::run();
+        dispatch::Default::loop::run();
+    }
+    catch (std::exception &e) {
+        Logger::err->critical("Indexer fail: {}", e.what());
+    }
 
     return EXIT_SUCCESS;
 }
