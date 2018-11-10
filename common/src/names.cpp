@@ -9,6 +9,7 @@ namespace milecsa::explorer::table {
 
     const vector<string>& get_names() {
         static vector<string> names = {
+                name::meta,
                 name::blockchain_info,
                 name::node_states,
                 name::node_wallets,

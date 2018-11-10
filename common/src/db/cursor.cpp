@@ -60,7 +60,7 @@ double db::Cursor::get_number()  {
         return 0;
     }
     catch (db::Error &e) {
-        Db::err->error("Table: {} error get_data: {}", db_->get_name(), e.message);
+        Db::err->warn("Table: {} error get_number: {}", db_->get_name(), e.message);
     }
     return 0;
 }
@@ -69,6 +69,18 @@ db::Cursor db::Cursor::max(const string &id) const {
     try {
         return  db::Cursor(
                 cursor_.max(db::Driver::optargs("index", id)).copy(),
+                std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error get_max: {}", db_->get_name(), e.message);
+    }
+    return db::Cursor();
+}
+
+db::Cursor db::Cursor::min(const string &id) const {
+    try {
+        return  db::Cursor(
+                cursor_.min(db::Driver::optargs("index", id)).copy(),
                 std::move(db_));
     }
     catch (db::Error &e) {

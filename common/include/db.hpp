@@ -90,9 +90,12 @@ namespace milecsa::explorer{
          * @param name - table name
          * @return table object
          */
-        Db::Table open_table(const std::string &name);
+        Db::Table open_table(const std::string &name) const;
 
         void delete_table(const std::string &name);
+
+        unsigned int get_version() const;
+        void update_version(unsigned int version);
 
         /**
          * Db name
@@ -132,15 +135,11 @@ namespace milecsa::explorer{
 
         /**
          * Get the last block id indexed in DB
-         * @return block id
-         */
-        uint256_t get_start_block_id() const { return last_block_id_; }
-
-        /**
-         * Get the current last approved block in blockchain
          * @return
          */
         uint256_t get_last_block_id() const;
+
+        uint256_t get_last_processed_block_id() const;
 
         /**
          * Get current indexed network state
@@ -194,6 +193,8 @@ namespace milecsa::explorer{
         void add_wallet_transaction(const db::Data &transactions, uint256_t block_id);
 
         db::Result query() const {return db::Driver::db(db_name_);};
+
+        void transactions_processing();
 
         std::string    host_;
         unsigned short port_;
