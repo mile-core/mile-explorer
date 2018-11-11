@@ -12,6 +12,10 @@
 node_urls: ["http://lotus000.testnet.mile.global/v1/api",
             "http://lotus001.testnet.mile.global/v1/api"]
 
+#node_urls: ["https://lotus000.i.mile.global/v1/api",
+#            "https://lotus001.i.mile.global/v1/api",
+#            "https://lotus002.i.mile.global/v1/api"]
+
 #
 # Processing options
 #
