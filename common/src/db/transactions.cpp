@@ -173,6 +173,6 @@ void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
 
         db::Table::Open(*this, table::name::transactions_processing)->insert(stream);
 
-        Db::log->trace("Processing: block-id: {} is empty", id);
+        Db::log->trace("Processing: block-id: {} transactions is empty", id);
     }
 }

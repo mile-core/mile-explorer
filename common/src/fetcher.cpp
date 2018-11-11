@@ -128,7 +128,7 @@ void Fetcher::fetch_blocks(uint256_t from, uint256_t to) {
     Fetcher::log->info("Fetcher: pocessing blocks: [{}:{}] is in progress ...",
             UInt256ToDecString(from), UInt256ToDecString(to));
 
-    for (auto i = from; i < to; i++){
+    for (auto i = from; i <= to; i++){
 
         rpc_fetching_block_task_->async([i, from, to, this]{
 
@@ -160,7 +160,6 @@ void Fetcher::fetch_blocks(uint256_t from, uint256_t to) {
                     }
 
                     block = response->at("block-data");
-
                 }
                 catch (std::exception &e) {
                     Fetcher::err->error("Fetcher: {} error fetching block id {}", " = ", e.what());

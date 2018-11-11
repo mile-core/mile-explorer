@@ -45,16 +45,36 @@ uint256_t Db::get_last_block_id() const {
         processing_block_id = static_cast<uint256_t>(id);
 
     } catch (db::Error &e) {
-        Db::err->trace("Db: {} error reading last block id from transactions_processing {}", db_name_.c_str(), e.message);
+        Db::err->trace("Db: {} error reading processing block id from transactions_processing {}", db_name_.c_str(), e.message);
+    }
+
+    uint256_t last_block_id = 0;
+
+    try {
+        auto id =  db::Table::Open(*this, table::name::blocks)
+                ->cursor()
+                .max("block-id")
+                .field("block-id")
+                .get_number();
+
+        last_block_id = static_cast<uint256_t>(id);
+
+    } catch (db::Error &e) {
+        Db::err->trace("Db: {} error reading last block id from blocks {}", db_name_.c_str(), e.message);
     }
 
     uint256_t state_block_id = get_last_processed_block_id();
 
-    Db::log->debug("Db: {}  state block-id: {}, processing block-id: {}",
+    Db::log->debug("Db: {}  state block-id: {}, processing block-id: {}, last block-id: {}",
                    db_name_.c_str(),
                    UInt256ToDecString(state_block_id),
-                   UInt256ToDecString(processing_block_id)
+                   UInt256ToDecString(processing_block_id),
+                   UInt256ToDecString(last_block_id)
     );
+
+    if (processing_block_id == 0) {
+        return last_block_id;
+    }
 
     return state_block_id > processing_block_id ? state_block_id : processing_block_id;
 }
