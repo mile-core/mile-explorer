@@ -17,6 +17,28 @@ namespace milecsa::explorer::db {
 
     void migration(std::optional<Db> db) {
         unsigned int v = indexerVersion();
+        unsigned int dbv = db->get_version();
+
+        Logger::log->info("Logger: previous db[{}] version: {}, indexer version: {}", db->get_name().c_str(), dbv, v);
+
+        try {
+            auto old = db->open_table(table::name::meta)->cursor()
+                    .get("version")
+                    .field("current")
+                    .get_number();
+
+            if (old <= 122) {
+                db->open_table(table::name::meta)->cursor()
+                        .get("version").remove();
+            }
+
+        }
+        catch (db::Error & e)
+        {
+            Db::err->warn("Db: {} get_version error {}", db->get_name().c_str(), e.message);
+        }
+
+
         if (v > db->get_version()) {
             //
             // Do migrations
@@ -60,6 +82,5 @@ namespace milecsa::explorer::db {
                            state_block_id,
                            processing_block_id);
         }
-
     }
 }
