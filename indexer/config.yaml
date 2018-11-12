@@ -9,12 +9,12 @@
 #            "https://nyc01.t.mile.global/v1/api",
 #            "https://trnt01.t.mile.global/v1/api"]
 
-node_urls: ["http://lotus000.testnet.mile.global/v1/api",
-            "http://lotus001.testnet.mile.global/v1/api"]
+#node_urls: ["http://lotus000.testnet.mile.global/v1/api",
+#            "http://lotus001.testnet.mile.global/v1/api"]
 
-#node_urls: ["https://lotus000.i.mile.global/v1/api",
-#            "https://lotus001.i.mile.global/v1/api",
-#            "https://lotus002.i.mile.global/v1/api"]
+node_urls: ["https://lotus000.i.mile.global/v1/api",
+            "https://lotus001.i.mile.global/v1/api",
+            "https://lotus002.i.mile.global/v1/api"]
 
 #
 # Processing options
@@ -29,7 +29,7 @@ block_processin_queue_size: 16
 #
 db_host: "localhost"
 db_port: 28015
-db_name: "blockchain"
+db_name: "blockchain_mainnet"
 
 #
 # Debug

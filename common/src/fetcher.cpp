@@ -65,11 +65,12 @@ Fetcher::Fetcher(
 
 void Fetcher::run(uint256_t block_id) {
 
-    Fetcher::log->info("Fetcher: starting ...");
-
     main_fetching_task_->async([this, block_id]{
 
         uint256_t first = block_id;
+
+        Fetcher::log->info("Fetcher: starting ... {}, block-id: {}",
+                main_fetching_task_->is_running(), UInt256ToDecString(block_id));
 
         while(main_fetching_task_->is_running()) {
 
@@ -105,9 +106,10 @@ void Fetcher::run(uint256_t block_id) {
                     });
                 }
             }
-
             std::this_thread::sleep_for(std::chrono::seconds(this->update_timeout_));
         }
+
+        Fetcher::log->info("Fetcher: stopped ... ");
     });
 
     //
