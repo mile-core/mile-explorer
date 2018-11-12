@@ -77,7 +77,7 @@ void Fetcher::run(uint256_t block_id) {
             auto client = this->get_rpc();
 
             if (!client){
-                Logger::err->warn("Fetcher: main request failed, retrying}");
+                Logger::err->warn("Fetcher: main request failed, retrying");
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 continue;
             }
@@ -87,14 +87,16 @@ void Fetcher::run(uint256_t block_id) {
             //
             optional<uint256_t> next_block_id = client->get_current_block_id();
 
+            Logger::log->info("Fetcher: next block: {}", UInt256ToDecString(first));
+
             if (next_block_id) {
                 uint256_t last = *next_block_id;
 
-                Fetcher::log->trace(
-                        "Getting block id from {} to {}, fetcher queue state: {}",
+                Fetcher::log->debug(
+                        "Getting block ids: [{}:{}], block fetcher queue is busy: {}",
                         UInt256ToDecString(first),
                         UInt256ToDecString(last),
-                        this->block_fetcher_task_->is_active());
+                        (this->block_fetcher_task_->is_active()));
 
                 //
                 // Start block fetching
