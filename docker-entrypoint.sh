@@ -19,8 +19,8 @@ RUN=""
 while getopts "a:c:h" opt; do
     case $opt in
         a) FLAG=true
-           if [ "$OPTARG" = "indexer" ] ; then RUN=/app/build/indexer/mile-indexer; fi
-           if [ "$OPTARG" = "explorer" ]; then RUN=/app/build/backend/mile-explorer-backend; fi
+           if [ "$OPTARG" = "indexer" ] ; then RUN=/app/indexer/mile-indexer; fi
+           if [ "$OPTARG" = "explorer" ]; then RUN=/app/backend/mile-explorer-backend; fi
            if [ "$RUN" = "" ]; then usage; fi
         ;;
         c) CONF="--config=$OPTARG";;
