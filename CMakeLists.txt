@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(mile-explorer VERSION 1.2.2 LANGUAGES CXX)
+project(mile-explorer VERSION 1.2.5 LANGUAGES CXX)
 
 set(VERSION_FILE "version.txt")
 

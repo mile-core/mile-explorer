@@ -65,7 +65,7 @@ uint256_t Db::get_last_block_id() const {
 
     uint256_t state_block_id = get_last_processed_block_id();
 
-    Db::log->debug("Db: {}  state block-id: {}, processing block-id: {}, last block-id: {}",
+    Db::log->debug("Db: {} state block-id: {}, processing block-id: {}, last block-id: {}",
                    db_name_.c_str(),
                    UInt256ToDecString(state_block_id),
                    UInt256ToDecString(processing_block_id),

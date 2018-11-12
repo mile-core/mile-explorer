@@ -60,9 +60,9 @@ Db::~Db(){}
 
 unsigned int Db::get_version() const {
     try {
-        return open_table(table::name::meta)->cursor()
-                .get("version")
-                .field("current")
+        return (unsigned int)open_table(table::name::meta)->cursor()
+                .max("id")
+                .field("version")
                 .get_number();
     }
     catch (db::Error & e)
@@ -74,14 +74,31 @@ unsigned int Db::get_version() const {
 
 void Db::update_version(unsigned int version) {
     try {
+        unsigned int restart_number = 0;
+        try {
+            restart_number = (unsigned int)open_table(table::name::meta)->cursor()
+                    .max("id")
+                    .field("id")
+                    .get_number();
+            ++restart_number;
+        }
+        catch (db::Error & e)
+        {
+            Db::err->error("Db: {} get_version error {}", db_name_.c_str(), e.message);
+        }
+
+        unsigned int previous_version = get_version();
+
+        Db::log->info("Db: {} restarts: {}, new version {}, previuos; {}",
+                db_name_.c_str(), restart_number, version, previous_version);
 
         db::Data meta = {
-                {"id",        "version"},
-                {"current",   version},
-                {"previous",  get_version()},
+                {"id",               restart_number},
+                {"version",          version},
+                {"previous_version", previous_version},
                 {"timestamp", time(0)}
         };
-        open_table(table::name::meta)->update(meta);
+        open_table(table::name::meta)->insert(meta);
     }
     catch (db::Error & e)
     {
@@ -225,6 +242,7 @@ void Db::transactions_processing() {
                     uint64_t    bid   = item["block-id"];
                     std::string trxid = item["id"];
 
+
                     if (prev_bid>0) {
 
                         if (item.at("transaction-type") == "__processing__") {
@@ -233,11 +251,17 @@ void Db::transactions_processing() {
                             open_table(table::name::transactions_processing)->cursor().remove(trxid);
                             continue;
                         }
+
                         if ((bid-prev_bid)>1) {
                             Db::log->debug("Processing: transaction {} is in a forward block {} while current is {}", trxid, bid, prev_bid);
                             prev_bid = bid;
                             break;
                         }
+                    }
+                    else if (item.at("transaction-type") == "__processing__") {
+                        prev_bid = bid;
+                        open_table(table::name::transactions_processing)->cursor().remove(trxid);
+                        continue;
                     }
 
                     prev_bid = bid;
