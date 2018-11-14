@@ -9,7 +9,7 @@ http_port: 8042
 #
 db_host: "localhost"
 db_port: 28015
-db_name: "blockchain_mainnet"
+db_name: "blockchain"
 
 #
 # Concurrency connections

@@ -13,13 +13,13 @@
 using namespace milecsa::explorer;
 using namespace std;
 
-void Db::block_changes(const db::Data &block, uint256_t id) {
+void Db::block_changes(const db::Data &block, uint256_t id, time_t t) {
 
     try {
         db::Data trx = block.at("transactions");
         Db::log->trace("Db: get transactions {}... {} ", db_name_.c_str(), trx.dump());
 
-        add_transactions(trx, id);
+        add_transactions(trx, id, t);
 
     }
     catch (db::Timeout &e) {
@@ -39,7 +39,7 @@ inline void replace_keys(const string &key_from, const string &key_to,  db::Data
 
 inline map<string,string> find_public_keys(const db::Data &trx) {
 
-    vector<string> keys = {"from", "to", "public-key"};
+    vector<string> keys = {"from", "public-key"};
 
     map<string,string> ret;
 
@@ -60,7 +60,9 @@ inline map<string,string> find_public_keys(const db::Data &trx) {
     return ret;
 }
 
-uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_id, db::Data &output_trx) { //, uint64_t idx){
+uint64_t Db::add_stream_transaction(const db::Data &input_trx,
+        uint256_t block_id, time_t t,
+        db::Data &output_trx) {
 
     std::string id = UInt256ToDecString(block_id);
 
@@ -82,6 +84,7 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_i
 
         trx["id"] = pk;
         trx["block-id"] = std::stoull(id);
+        trx["timestamp"] = t;
 
         if (trx["transaction-id"].is_string()){
             string trx_it = trx["transaction-id"];
@@ -105,7 +108,7 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx, uint256_t block_i
     return count;
 }
 
-void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
+void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id, time_t t){
 
     std::string id = UInt256ToDecString(block_id);
     auto _block_id = std::stoull(id);
@@ -115,14 +118,14 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
 
     for(const auto &entry: find_public_keys(trx)) {
 
-        db::Data transaction_raw = {
-                {"id",   entry.second},
-                {"block-id",   _block_id},
-                {"transaction-type", trx["transaction-type"]}
-        };
-
         db::Data transactions_col;
-        transactions_col.push_back(transaction_raw);
+
+        transactions_col.push_back({
+                                           {"id",   entry.second},
+                                           {"block-id",   _block_id},
+                                           {"transaction-type", trx["transaction-type"]},
+                                           {"timestamp", t}
+                                   });
 
         std::map<string, db::Data> query = {
                 {"blocks",       blocks},
@@ -130,16 +133,20 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id){
         };
 
         db::Table::Open(*this, table::name::wallets)->update(entry.first, query);
+
+        if (trx.count("to")>0){
+            db::Table::Open(*this, table::name::wallets)->update(trx["to"], query);
+        }
     }
 }
 
-void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
+void Db::add_transactions(const db::Data &transactions, uint256_t block_id, time_t t) {
 
     if(transactions.is_array()) {
         transactions_queue_.async([=] {
             uint64_t count = 0 ;
             for ( auto trx: transactions ) {
-                add_wallet_transaction(trx, block_id);
+                add_wallet_transaction(trx, block_id, t);
                 count++ ;
             }
 
@@ -153,7 +160,7 @@ void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
             db::Data stream;
 
             for ( auto trx: transactions ) {
-                count += add_stream_transaction(trx, block_id, stream);
+                count += add_stream_transaction(trx, block_id, t, stream);
             }
 
             db::Table::Open(*this, table::name::transactions_processing)->insert(stream);
@@ -170,6 +177,7 @@ void Db::add_transactions(const db::Data &transactions, uint256_t block_id) {
         stream["id"] = id;
         stream["block-id"] = std::stoull(id);
         stream["transaction-type"] = "__processing__";
+        stream["timestamp"] = t;
 
         db::Table::Open(*this, table::name::transactions_processing)->insert(stream);
 

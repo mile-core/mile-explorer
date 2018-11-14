@@ -18,7 +18,8 @@ namespace milecsa::explorer::table {
                 name::wallets,
                 name::transactions,
                 name::transactions_state,
-                name::transactions_processing
+                name::transactions_processing,
+                name::turnovers
         };
 
         return names;
@@ -27,10 +28,12 @@ namespace milecsa::explorer::table {
     const vector<table::index::description>& get_indices() {
         static vector<index::description> indices = {
                 {name::blocks, "block-id"},
+                {name::blocks, "timestamp"},
                 {name::blockchain_state, "block-id"},
                 {name::node_states, "block-id"},
                 {name::transactions, "block-id"},
                 {name::transactions, "serial"},
+                {name::transactions, "timestamp"},
                 {name::transactions_processing, "block-id"},
 
         };

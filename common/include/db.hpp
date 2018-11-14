@@ -123,7 +123,7 @@ namespace milecsa::explorer{
          * @param transactions - transactions array
          * @param block_id - block id
          */
-        void add_transactions(const db::Data &transactions, uint256_t block_id);
+        void add_transactions(const db::Data &transactions, uint256_t block_id, time_t t);
 
         /**
          * Update current network state
@@ -179,6 +179,11 @@ namespace milecsa::explorer{
         db::Data get_transaction_history(uint64_t first_id, uint64_t limit) const;
         db::Data get_transaction_by_id(const string &id) const;
 
+        /**
+         * Get turnover for 24 hours stats
+         * @return
+         */
+        db::Data get_turnovers_24() const;
 
     protected:
         const db::Connection get_connection() const;
@@ -187,14 +192,20 @@ namespace milecsa::explorer{
         Db():db_name_(""),host_(), port_(0), last_block_id_(0), exists_(false) {}
         Db(const std::string &db_name, const std::string &ip, unsigned short port, bool exists);
 
-        void block_changes(const db::Data &block, uint256_t id);
+        /// processing
+        void block_changes(const db::Data &block, uint256_t id, time_t t);
 
-        uint64_t add_stream_transaction(const db::Data &imput_trx, uint256_t block_id, db::Data &output_trx);//, uint64_t idx);
-        void add_wallet_transaction(const db::Data &transactions, uint256_t block_id);
+        uint64_t add_stream_transaction(const db::Data &imput_trx,
+                uint256_t block_id, time_t t, db::Data &output_trx);
 
-        db::Result query() const {return db::Driver::db(db_name_);};
+        void add_wallet_transaction(const db::Data &transactions, uint256_t block_id, time_t t);
 
         void transactions_processing();
+
+        void turnovers_processing();
+
+        /// < -
+        db::Result query() const {return db::Driver::db(db_name_);};
 
         std::string    host_;
         unsigned short port_;
@@ -203,6 +214,7 @@ namespace milecsa::explorer{
 
         bool exists_;
 
+        static dispatch::Queue common_processing_queue_;
         static dispatch::Queue transactions_queue_;
         static dispatch::Queue transactions_update_index_queue_;
 

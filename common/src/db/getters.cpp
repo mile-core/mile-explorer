@@ -111,7 +111,7 @@ db::Data Db::get_wallet_node(const string &public_key) const {
 }
 
 db::Data Db::get_block_history_state() const {
-    return db::Table::Open(*this, table::name::blockchain_state)
+    return db::Table::Open(*this, table::name::blocks)
             ->cursor()
             .max("block-id")
             .get_data();
@@ -195,5 +195,12 @@ db::Data Db::get_transaction_by_id(const string &id) const {
     return db::Table::Open(*this, table::name::transactions)
             ->cursor()
             .get(id)
+            .get_data();
+}
+
+db::Data Db::get_turnovers_24() const {
+    return db::Table::Open(*this, table::name::turnovers)
+            ->cursor()
+            .get("turnovers-24")
             .get_data();
 }
