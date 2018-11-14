@@ -15,6 +15,8 @@ using namespace std;
 
 namespace milecsa::explorer::db {
 
+    extern void m127(std::optional<Db> db);
+
     void migration(std::optional<Db> db) {
         unsigned int v = indexerVersion();
         unsigned int dbv = db->get_version();
@@ -31,6 +33,10 @@ namespace milecsa::explorer::db {
                 db->open_table(table::name::meta)->cursor()
                         .get("version").remove();
             }
+
+            if (old < 127)
+                m127(db);
+
 
         }
         catch (db::Error & e)

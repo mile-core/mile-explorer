@@ -9,6 +9,7 @@
 #include "db.hpp"
 #include "table.hpp"
 #include "names.hpp"
+#include "utils.hpp"
 
 using namespace milecsa::explorer;
 using namespace std;
@@ -28,7 +29,15 @@ void Db::add_block(const db::Data &_block, uint256_t block_id) {
                 Db::log->trace("Processing: block {} already is in table",  id);
             }
 
-            block["block-id"] = std::stoull(id);
+            block["block-id"]  = std::stoull(id);
+            std::time_t tm = std::time(nullptr);
+            if (block.count("timestamp"))
+                block["timestamp"] = getEpochTime(block["timestamp"]);
+            else
+                block["timestamp"] = tm;
+
+            block["index-timestamp"] = tm;
+
             db::Table::Open(*this, table::name::blocks)->insert(block);
 
             db::Data state;
@@ -38,7 +47,7 @@ void Db::add_block(const db::Data &_block, uint256_t block_id) {
             db::Table::Open(*this, table::name::blockchain_state)->insert(state);
         }
 
-        block_changes(block, block_id);
+        block_changes(block, block_id, block["timestamp"]);
 
         Db::log->trace("Db: {} block-id: {} processed", db_name_.c_str(),id);
     }

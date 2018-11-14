@@ -29,7 +29,7 @@ block_processin_queue_size: 16
 #
 db_host: "localhost"
 db_port: 28015
-db_name: "blockchain_mainnet"
+db_name: "blockchain"
 
 #
 # Debug

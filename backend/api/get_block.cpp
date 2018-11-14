@@ -3,6 +3,7 @@
 //
 
 #include "api/registry.hpp"
+#include "utils.hpp"
 
 using namespace milecsa::explorer;
 

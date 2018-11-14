@@ -1,0 +1,7 @@
+POST http://localhost:8042/v1/api
+Accept: */*
+Cache-Control: no-cache
+
+{"jsonrpc":"2.0","method":"get-turnovers","params":{},"id":"1"}
+
+###

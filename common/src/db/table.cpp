@@ -49,7 +49,7 @@ db::Cursor db::Table::cursor() const {
     try {
         db::Result q = db_->query();
         return  db::Cursor(
-                q.table(name_),
+                q.table(name_, db::Driver::optargs("read_mode", "outdated")),
                 std::move(db_));
     }
     catch (db::Error &e) {

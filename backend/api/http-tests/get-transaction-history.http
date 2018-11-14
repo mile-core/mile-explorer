@@ -1,4 +1,4 @@
-POST http://localhost:8042/v1/api
+POST https://explorer.mile.global/v1/api
 Accept: */*
 Cache-Control: no-cache
 
