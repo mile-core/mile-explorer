@@ -32,6 +32,7 @@ namespace milecsa::explorer::table {
                 {name::blockchain_state, "block-id"},
                 {name::node_states, "block-id"},
                 {name::transactions, "block-id"},
+                {name::transactions, "digest"},
                 {name::transactions, "serial"},
                 {name::transactions, "timestamp"},
                 {name::transactions_processing, "block-id"},

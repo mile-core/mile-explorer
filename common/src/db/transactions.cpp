@@ -9,6 +9,7 @@
 #include "db.hpp"
 #include "table.hpp"
 #include "names.hpp"
+#include <milecsa.hpp>
 
 using namespace milecsa::explorer;
 using namespace std;
@@ -96,6 +97,12 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx,
 
         for (const auto &[from, to]: table::get_replacement_keys()) {
             replace_keys(from, to, trx);
+        }
+
+        if (trx.count("description")>0){
+            std::string desc = trx["description"];
+            size_t truncate_size = min(desc.length(),(size_t)milecsa::transaction::description_max_length);
+            trx["description"] = desc.substr(0,truncate_size);
         }
 
         output_trx.push_back(trx);

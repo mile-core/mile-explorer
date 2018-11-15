@@ -317,13 +317,13 @@ void Db::transactions_processing() {
 
                 uint64_t count = 0;
 
-                Db::log->info("Db: {} transactions processing queue reading items: {}", db_name_.c_str(), items.size());
+                Db::log->info("Db: {} transactions processing queue reading items: {}",
+                        db_name_.c_str(), items.size());
 
                 for (auto &item: items) {
 
                     uint64_t    bid   = item["block-id"];
                     std::string trxid = item["id"];
-
 
                     if (prev_bid>0) {
 
@@ -339,6 +339,7 @@ void Db::transactions_processing() {
                             prev_bid = bid;
                             break;
                         }
+
                     }
                     else if (item.at("transaction-type") == "__processing__") {
                         prev_bid = bid;
@@ -366,7 +367,7 @@ void Db::transactions_processing() {
 
                         open_table(table::name::transactions_processing)->cursor().remove(trxid);
 
-                        Db::log->trace("Db: {} transaction serial number updated: {}, block-id: {}",
+                        Db::log->debug("Db: {} transaction serial number updated: {}, block-id: {}",
                                        db_name_.c_str(), last_count, bid);
                     });
 
