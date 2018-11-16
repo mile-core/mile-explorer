@@ -5,7 +5,7 @@
 
 #include <string>
 #include <vector>
-#import "version.hpp"
+#include "version.hpp"
 
 namespace milecsa::explorer {
 
