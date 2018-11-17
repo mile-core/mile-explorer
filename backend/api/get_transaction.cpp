@@ -8,6 +8,12 @@ using namespace milecsa::explorer;
 
 static auto method = [](server::context &ctx, const ctxDb &db) {
 
+    if (ctx.request.params.count(api::params::digest)) {
+        auto param = ctx.request.params.at(api::params::digest);
+        ctx.response.result = db->get_transaction_by_digest(param.get<std::string>());
+        return;
+    }
+
     if (!api::params::check(ctx, api::params::id)) return;
 
     auto param = ctx.request.params.at(api::params::id);

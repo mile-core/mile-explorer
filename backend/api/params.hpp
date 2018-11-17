@@ -17,6 +17,7 @@ namespace milecsa::explorer {
         constexpr const char *limit = "limit";
         constexpr const char *first = "first";
         constexpr const char *public_key = "public-key";
+        constexpr const char *digest = "digest";
 
         inline auto error(context &ctx, const char *param) -> void {
             return make_response_parse_error(ctx, ErrorFormat("param %s has not found", param));
