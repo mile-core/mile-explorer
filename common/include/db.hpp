@@ -178,6 +178,7 @@ namespace milecsa::explorer{
         uint64_t get_transaction_history_state() const;
         db::Data get_transaction_history(uint64_t first_id, uint64_t limit) const;
         db::Data get_transaction_by_id(const string &id) const;
+        db::Data get_transaction_by_digest(const string &id) const;
 
         /**
          * Get turnover for 24 hours stats

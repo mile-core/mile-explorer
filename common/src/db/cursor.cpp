@@ -81,11 +81,10 @@ db::Cursor db::Cursor::min(const string &id) const {
     return db::Cursor();
 }
 
-db::Cursor db::Cursor::get(const string &id)const {
+db::Cursor db::Cursor::get(const string &id,  const optional<std::string> &index)const {
     try {
-        return  db::Cursor(
-                cursor_.get(id),
-                std::move(db_));
+        auto res = index ? cursor_.get_all(id, db::Driver::optargs("index", *index)) : cursor_.get(id);
+        return  db::Cursor(res, std::move(db_));
     }
     catch (db::Error &e) {
         Db::err->error("Table: {} error get({}): {}", db_->get_name(), id, e.message);

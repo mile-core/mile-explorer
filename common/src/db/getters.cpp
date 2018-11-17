@@ -198,6 +198,13 @@ db::Data Db::get_transaction_by_id(const string &id) const {
             .get_data();
 }
 
+db::Data Db::get_transaction_by_digest(const string &id) const{
+    return db::Table::Open(*this, table::name::transactions)
+            ->cursor()
+            .get(id, "digest")
+            .get_data();
+}
+
 db::Data Db::get_turnovers_24() const {
     return db::Table::Open(*this, table::name::turnovers)
             ->cursor()

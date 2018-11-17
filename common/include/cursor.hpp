@@ -49,7 +49,7 @@ namespace milecsa::explorer {
             Cursor max(const string &id)const;
             Cursor min(const string &id)const;
             Cursor field(const string &field_name)const;
-            Cursor get(const string &id)const;
+            Cursor get(const string &id, const optional<std::string> &index=nullopt)const;
             Cursor remove(const string &id);
             Cursor remove();
             Cursor count()const;
