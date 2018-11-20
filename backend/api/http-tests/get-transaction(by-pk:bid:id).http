@@ -1,0 +1,11 @@
+POST http://localhost:8042/v1/api
+Accept: */*
+Cache-Control: no-cache
+
+#{"jsonrpc":"2.0","method":"get-transaction","params":{"id": 1360737683, "block-id":502, "public-key": "xBWNvpnXpgazLVE16t7pQkdrzvyavwArTTM9iJQ2cJr6eg3b7"},"id":"1"}
+
+#{"jsonrpc":"2.0","method":"get-transaction","params":{"id": 1360737683, "block-id":"502", "public-key": "xBWNvpnXpgazLVE16t7pQkdrzvyavwArTTM9iJQ2cJr6eg3b7"},"id":"1"}
+
+{"jsonrpc":"2.0","method":"get-transaction","params":{"id": "1360737683", "block-id":"502", "public-key": "xBWNvpnXpgazLVE16t7pQkdrzvyavwArTTM9iJQ2cJr6eg3b7"},"id":"1"}
+
+###

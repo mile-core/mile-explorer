@@ -2,7 +2,7 @@ POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
-{"jsonrpc":"2.0","method":"get-transaction","params":{"id": "21M9emgkque1mUYwQcwp5onJGiajqv1gxsSDEv2gRJwM1M4bN1:107031663"},"id":"1"}
+{"jsonrpc":"2.0","method":"get-transaction","params":{"id": "xBWNvpnXpgazLVE16t7pQkdrzvyavwArTTM9iJQ2cJr6eg3b7:502:1360737683"},"id":"1"}
 
 ##
 ## Wrong

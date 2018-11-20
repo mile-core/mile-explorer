@@ -17,6 +17,7 @@ namespace milecsa::explorer {
         constexpr const char *limit = "limit";
         constexpr const char *first = "first";
         constexpr const char *public_key = "public-key";
+        constexpr const char *block_id = "block-id";
         constexpr const char *digest = "digest";
 
         inline auto error(context &ctx, const char *param) -> void {

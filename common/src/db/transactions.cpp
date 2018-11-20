@@ -38,7 +38,7 @@ inline void replace_keys(const string &key_from, const string &key_to,  db::Data
     }
 }
 
-inline map<string,string> find_public_keys(const db::Data &trx) {
+inline map<string,string> find_public_keys(const db::Data &trx, std::string block_id) {
 
     vector<string> keys = {"from", "public-key"};
 
@@ -52,6 +52,8 @@ inline map<string,string> find_public_keys(const db::Data &trx) {
         string address = trx[address_name].get<std::string>();
         string trx_id(address);
 
+        trx_id.append(":");
+        trx_id.append(block_id);
         trx_id.append(":");
         trx_id.append(trx["transaction-id"].get<std::string>());
 
@@ -71,9 +73,9 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx,
 
     uint64_t count = 0;
 
-    for(const auto &entry: find_public_keys(trx)) {
+    for(const auto &entry: find_public_keys(trx, id)) {
 
-        std::string pk = entry.second;
+        std::string uniq_id = entry.second;
 
         db::Data row = db::Table::Open(*this, table::name::transactions_processing)
                 ->cursor().get(id).get_data();
@@ -83,13 +85,12 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx,
             continue;
         }
 
-        trx["id"] = pk;
+        trx["id"] = uniq_id;
         trx["block-id"] = std::stoull(id);
         trx["timestamp"] = t;
 
         if (trx["transaction-id"].is_string()){
-            string trx_it = trx["transaction-id"];
-            trx["transaction-id"] = trx["transaction-id"];
+            trx["transaction-id"] = trx["transaction-id"].get<string>();
         }
         else if (trx["transaction-id"].is_number()) {
             trx["transaction-id"] = trx["transaction-id"].dump();
@@ -123,13 +124,14 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id, time_t 
     db::Data blocks;
     blocks.push_back(_block_id);
 
-    for(const auto &entry: find_public_keys(trx)) {
+    for(const auto &entry: find_public_keys(trx,id)) {
 
         db::Data transactions_col;
 
         transactions_col.push_back({
                                            {"id",   entry.second},
                                            {"block-id",   _block_id},
+                                           {"digest",     trx["digest"]},
                                            {"transaction-type", trx["transaction-type"]},
                                            {"timestamp", t}
                                    });
