@@ -13,7 +13,6 @@
 
 #define __MASSIVE_Q_TEST 1
 
-
 static const nlohmann::json tests = R"([
   {"method": "help",                     "params": {} },
   {"method": "ping",                     "params": {} },
@@ -32,7 +31,7 @@ static const nlohmann::json tests = R"([
   {"method": "get-wallet-history-transactions", "params": {"public-key":"25XmmZXDXbYrQMgSXQcCdcGvjec6iSR4hQ5AxfQJMC8NkMdGzZ", "first": 0, "limit": 3}}
 ])"_json;
 
-static std::string explorer_url = "http://localhost:8042/v1/api";
+static std::string explorer_url = "http://127.0.0.1:8042/v1/api";
 
 struct SessionEval {
 
@@ -51,7 +50,7 @@ struct SessionEval {
 
     std::shared_ptr<milecsa::rpc::detail::RpcSession> get_session(const std::string &u){
 
-        // milecsa::rpc::detail::RpcSession::debug_on = true;
+        milecsa::rpc::detail::RpcSession::debug_on = true;
 
         if (auto url = Url::Parse(u,error)){
 
@@ -61,10 +60,13 @@ struct SessionEval {
                             url->get_port(),
                             url->get_path(),
                             url->get_protocol(),
-                            false)
+                            false,
+                            4)
             );
 
-            session->connect(error);
+            if(!session->connect(error)){
+                return nullptr;
+            }
 
             return session;
 
