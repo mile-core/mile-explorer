@@ -158,8 +158,15 @@ void Fetcher::fetch_blocks(uint256_t from, uint256_t to) {
 
                     response = client->get_block(i);
 
+                    if (!response){
+                        Fetcher::err->warn("Fetcher: response is empty, retrying");
+                        std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
+                        continue;
+                    }
+
                     if (response->count("block-data")==0){
                         Fetcher::err->warn("Fetcher: block getting not data, retrying");
+                        std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
                         continue;
                     }
 
