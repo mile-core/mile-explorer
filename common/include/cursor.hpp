@@ -41,7 +41,7 @@ namespace milecsa::explorer {
             Cursor& operator= (Cursor&& other) = default;
 
             Cursor(const TableCursor &c, const optional<Db> &db)
-                    :cursor_(c), db_(db) {}
+                    :cursor_(c), db_(std::move(db)) {}
 
             db::Data          get_data();
             double            get_number();

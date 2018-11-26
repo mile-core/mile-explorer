@@ -42,7 +42,7 @@ namespace milecsa::explorer {
              * @return table shared pointer interface
              */
             static const Db::Table Open(const optional<Db> &db, const string &name){
-                return Db::Table(new Table(db, name));
+                return Db::Table(new Table(std::move(db), name));
             }
 
             /**
