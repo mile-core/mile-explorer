@@ -360,16 +360,14 @@ void Db::transactions_processing() {
 
                     item["serial"] = last_count++;
 
-                    update_stream_q.async([=]{
-                        open_table(table::name::transactions)->insert(item);
+                    open_table(table::name::transactions)->insert(item);
 
-                        update_state(this, last_count, bid);
+                    update_state(this, last_count, bid);
 
-                        open_table(table::name::transactions_processing)->cursor().remove(trxid);
+                    open_table(table::name::transactions_processing)->cursor().remove(trxid);
 
-                        Db::log->debug("Db: {} transaction serial number updated: {}, block-id: {}",
-                                       db_name_.c_str(), last_count, bid);
-                    });
+                    Db::log->debug("Db: {} transaction serial number updated: {}, block-id: {}",
+                                   db_name_.c_str(), last_count, bid);
 
                     count++;
                 }

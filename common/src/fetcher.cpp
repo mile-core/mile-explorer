@@ -74,40 +74,50 @@ void Fetcher::run(uint256_t block_id) {
 
         while(main_fetching_task_->is_running()) {
 
-            auto client = this->get_rpc();
+            try {
+                auto client = this->get_rpc();
 
-            if (!client){
-                Logger::err->warn("Fetcher: main request failed, retrying");
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-                continue;
-            }
-
-            //
-            // prepare fetching block
-            //
-            optional<uint256_t> next_block_id = client->get_current_block_id();
-
-            Logger::log->info("Fetcher: next block: {}", UInt256ToDecString(first));
-
-            if (next_block_id) {
-                uint256_t last = *next_block_id;
-
-                Fetcher::log->debug(
-                        "Getting block ids: [{}:{}], block fetcher queue is busy: {}",
-                        UInt256ToDecString(first),
-                        UInt256ToDecString(last),
-                        (this->block_fetcher_task_->is_active()));
-
-                //
-                // Start block fetching
-                //
-                if (!this->block_fetcher_task_->is_active() && (first<last)) {
-                    block_fetcher_task_->async([this, &first, last] {
-                        this->fetch_blocks(first,last);
-                        first = last;
-                    });
+                if (!client){
+                    Logger::err->warn("Fetcher: main request failed, retrying");
+                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                    continue;
                 }
+
+                //
+                // prepare fetching block
+                //
+                optional<uint256_t> next_block_id = client->get_current_block_id();
+
+                Logger::log->info("Fetcher: next block: {}", UInt256ToDecString(first));
+
+                if (next_block_id) {
+                    uint256_t last = *next_block_id;
+
+                    Fetcher::log->debug(
+                            "Getting block ids: [{}:{}], block fetcher queue is busy: {}",
+                            UInt256ToDecString(first),
+                            UInt256ToDecString(last),
+                            (this->block_fetcher_task_->is_active()));
+
+                    //
+                    // Start block fetching
+                    //
+                    if (!this->block_fetcher_task_->is_active() && (first<last)) {
+                        block_fetcher_task_->async([this, &first, last] {
+                            this->fetch_blocks(first,last);
+                            first = last;
+                        });
+                    }
+                }
+
             }
+            catch (std::exception &e) {
+                Fetcher::err->critical("Fetcher:  next block error: {} ", e.what());
+            }
+            catch (...) {
+                Logger::log->info("Fetcher: next block Unknown error");
+            }
+
             std::this_thread::sleep_for(std::chrono::seconds(this->update_timeout_));
         }
 
@@ -149,9 +159,10 @@ void Fetcher::fetch_blocks(uint256_t from, uint256_t to) {
                     auto client = this->get_rpc();
 
                     if (!client){
-                        Fetcher::err->warn("Fetcher: block getting request failed, retrying");
+                        Fetcher::err->warn("Fetcher: block {} getting request failed, retrying", UInt256ToDecString(i));
                         std::this_thread::sleep_for(std::chrono::seconds(1));
-                        return;
+                        response.reset();
+                        continue;
                     }
 
                     cu = client->get_url().get_host();
@@ -159,14 +170,16 @@ void Fetcher::fetch_blocks(uint256_t from, uint256_t to) {
                     response = client->get_block(i);
 
                     if (!response){
-                        Fetcher::err->warn("Fetcher: response is empty, retrying");
+                        Fetcher::err->warn("Fetcher: response {} is empty, retrying", UInt256ToDecString(i));
                         std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
+                        response.reset();
                         continue;
                     }
 
                     if (response->count("block-data")==0){
-                        Fetcher::err->warn("Fetcher: block getting not data, retrying");
+                        Fetcher::err->warn("Fetcher: block {} getting not data, retrying", UInt256ToDecString(i));
                         std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
+                        response.reset();
                         continue;
                     }
 
@@ -175,10 +188,12 @@ void Fetcher::fetch_blocks(uint256_t from, uint256_t to) {
                 catch (std::exception &e) {
                     Fetcher::err->error("Fetcher: {} error fetching block id {}", " = ", e.what());
                     std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
+                    response.reset();
                 }
                 catch (...) {
                     Fetcher::err->error("Fetcher: something wrong ...");
                     std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
+                    response.reset();
                 }
             }
 

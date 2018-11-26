@@ -14,7 +14,8 @@
 
 node_urls: ["https://lotus000.i.mile.global/v1/api",
             "https://lotus001.i.mile.global/v1/api",
-            "https://lotus002.i.mile.global/v1/api"]
+            "https://lotus002.i.mile.global/v1/api",
+            "https://00.node.mile.global/v1/api"]
 
 #
 # Processing options

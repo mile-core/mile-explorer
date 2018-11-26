@@ -20,6 +20,7 @@
 #include "rapidjson/rapidjson.h"
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/document.h"
+#include "iostream"
 
 namespace RethinkDB {
 
@@ -180,7 +181,9 @@ std::string ReadLock::recv(size_t size) {
 }
 
 void Connection::close() {
+    
     CacheLock guard(d.get());
+
     for (auto& it : d->guarded_cache) {
         stop_query(it.first);
     }
