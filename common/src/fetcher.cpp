@@ -149,36 +149,41 @@ void Fetcher::fetch_blocks(uint256_t from, uint256_t to) {
             milecsa::rpc::response response;
             db::Data               block;
 
-            auto tick = boost::posix_time::microsec_clock::local_time();
-
             std::string cu;
 
+            auto tick = boost::posix_time::microsec_clock::local_time();
+
             while (!response) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(config::request_timeout));
 
                 try{
-                    auto client = this->get_rpc();
+                    {
+                        //
+                        // auto destroy
+                        //
+                        auto client = this->get_rpc();
 
-                    if (!client){
-                        Fetcher::err->warn("Fetcher: block {} getting request failed, retrying", UInt256ToDecString(i));
-                        std::this_thread::sleep_for(std::chrono::seconds(1));
-                        response.reset();
-                        continue;
+                        if (!client) {
+                            Fetcher::err->warn("Fetcher: block {} getting request failed, retrying",
+                                               UInt256ToDecString(i));
+                            std::this_thread::sleep_for(std::chrono::seconds(1));
+                            response.reset();
+                            continue;
+                        }
+
+                        cu = client->get_url().get_host();
+
+                        response = client->get_block(i);
                     }
-
-                    cu = client->get_url().get_host();
-
-                    response = client->get_block(i);
 
                     if (!response){
                         Fetcher::err->warn("Fetcher: response {} is empty, retrying", UInt256ToDecString(i));
-                        std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
                         response.reset();
                         continue;
                     }
 
                     if (response->count("block-data")==0){
                         Fetcher::err->warn("Fetcher: block {} getting not data, retrying", UInt256ToDecString(i));
-                        std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
                         response.reset();
                         continue;
                     }
@@ -186,13 +191,11 @@ void Fetcher::fetch_blocks(uint256_t from, uint256_t to) {
                     block = response->at("block-data");
                 }
                 catch (std::exception &e) {
-                    Fetcher::err->error("Fetcher: {} error fetching block id {}", " = ", e.what());
-                    std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
+                    Fetcher::err->error("Fetcher: fetching block id: {}, error: {}", UInt256ToDecString(i), e.what());
                     response.reset();
                 }
                 catch (...) {
                     Fetcher::err->error("Fetcher: something wrong ...");
-                    std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
                     response.reset();
                 }
             }
@@ -260,11 +263,9 @@ void Fetcher::fetch_states(){
         }
         catch (std::exception &e) {
             Fetcher::err->error("Fetcher: {} error fetching network meta data: {}", " = ", e.what());
-            std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
         }
         catch (...) {
             Fetcher::err->error("Fetcher: something wrong ...");
-            std::this_thread::sleep_for(std::chrono::milliseconds(this->update_timeout_));
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(this->update_timeout_));

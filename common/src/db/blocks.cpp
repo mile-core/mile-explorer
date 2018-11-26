@@ -49,7 +49,7 @@ void Db::add_block(const db::Data &_block, uint256_t block_id) {
 
         block_changes(block, block_id, block["timestamp"]);
 
-        Db::log->trace("Db: {} block-id: {} processed", db_name_.c_str(),id);
+        Db::log->debug("Db: {} block-id: {} processed", db_name_.c_str(),id);
     }
     catch (db::Error &e) {
         Db::err->error("Db: {} error processing add block {}", db_name_.c_str(), e.message);
