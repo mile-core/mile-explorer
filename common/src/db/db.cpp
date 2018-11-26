@@ -288,8 +288,6 @@ void Db::transactions_processing() {
 
         while (transactions_update_index_queue_.is_running()) {
 
-            std::this_thread::sleep_for(std::chrono::seconds(config::update_timeout));
-
             try{
 
                 auto update_state = [=](Db *db, uint64_t count, uint64_t block_id){
@@ -380,6 +378,8 @@ void Db::transactions_processing() {
             catch (...) {
                 Db::err->error("Db: transactions updating index unknown error ... ");
             }
+
+            std::this_thread::sleep_for(std::chrono::seconds(config::update_timeout));
         }
     });
 }
