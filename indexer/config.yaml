@@ -20,10 +20,10 @@ node_urls: ["https://lotus000.i.mile.global/v1/api",
 #
 # Processing options
 #
-request_timeout: 50 # msec.
+request_timeout: 100  # msec.
 update_timeout:  20  # sec.
-rpc_connection_timeout:  15  # sec.
-rpc_queue_size:  64
+rpc_connection_timeout:  10  # sec.
+rpc_queue_size:  48
 block_processin_queue_size: 4
 
 #

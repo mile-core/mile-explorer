@@ -6,6 +6,8 @@
 
 #include <milecsa.hpp>
 #include <milecsa_jsonrpc.hpp>
+#include <mutex>
+
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "config.hpp"
