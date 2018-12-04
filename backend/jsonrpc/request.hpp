@@ -82,7 +82,7 @@ namespace milecsa::rpc::server {
                                         (boost::posix_time::microsec_clock::local_time()
                                          - tick).total_milliseconds()/1000.0f;
 
-                    Logger::log->trace("rpc::Server: {} <- \"{}\" params:{} {:03.4f}s.",
+                    Logger::log->debug("rpc::Server: {} <- \"{}\" params:{} {:03.4f}s.",
                             path,
                             ctx.request.method,
                             ctx.request.params.dump(),

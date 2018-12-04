@@ -36,11 +36,21 @@ optional<Fetcher> Fetcher::Connect(
 }
 
 optional<milecsa::rpc::Client> Fetcher::get_rpc() {
-    return milecsa::rpc::Client::Connect(
-            urls_[random(0,urls_.size()-1)],
+
+    static uint64_t counter = 0;
+
+    //auto url = urls_[random(0,urls_.size()-1)];
+    auto url = urls_[counter++ % urls_.size()];
+
+    Fetcher::log->debug("Fetcher: get rpc connection: {}", url);
+
+    auto c = milecsa::rpc::Client::Connect(
+            url,
             true,
             Fetcher::response_fail_handler,
             Fetcher::error_handler);
+
+    return std::move(c);
 }
 
 optional<Db> &Fetcher::get_db() {
@@ -72,7 +82,7 @@ void Fetcher::run(uint256_t block_id) {
         Fetcher::log->info("Fetcher: starting ... {}, block-id: {}",
                 main_fetching_task_->is_running(), UInt256ToDecString(block_id));
 
-        while(main_fetching_task_->is_running()) {
+        while( true ) {
 
             try {
                 auto client = this->get_rpc();
@@ -121,7 +131,6 @@ void Fetcher::run(uint256_t block_id) {
             std::this_thread::sleep_for(std::chrono::seconds(this->update_timeout_));
         }
 
-        Fetcher::log->info("Fetcher: stopped ... ");
     });
 
     //
@@ -154,6 +163,7 @@ void Fetcher::fetch_blocks(uint256_t from, uint256_t to) {
             auto tick = boost::posix_time::microsec_clock::local_time();
 
             while (!response) {
+
                 std::this_thread::sleep_for(std::chrono::milliseconds(config::request_timeout));
 
                 try{

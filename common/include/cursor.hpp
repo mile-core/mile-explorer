@@ -79,6 +79,5 @@ namespace milecsa::explorer {
             optional<Db> db_;
             TableCursor cursor_;
         };
-
     }
 }

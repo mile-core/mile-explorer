@@ -18,7 +18,6 @@ const milecsa::http::ResponseHandler Logger::response_fail_handler = [](
         const milecsa::http::status code,
         const std::string &method,
         const milecsa::http::response &http){
-
     std::string  message = http.body().data();
     Logger::err->error("rpc response:[code:{}, method:{}] {}", (int)code, method, message);
 };

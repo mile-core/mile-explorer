@@ -50,7 +50,7 @@ struct SessionEval {
 
     std::shared_ptr<milecsa::rpc::detail::RpcSession> get_session(const std::string &u){
 
-        milecsa::rpc::detail::RpcSession::debug_on = true;
+        milecsa::rpc::detail::RpcSession::debug_on = false;
 
         if (auto url = Url::Parse(u,error)){
 
