@@ -5,6 +5,7 @@
 
 #include "fetcher.hpp"
 #include "db.hpp"
+#include "statistics.hpp"
 
 static std::string opt_config_file = "";
 
@@ -19,6 +20,14 @@ int main(int argc, char *argv[]) {
 
     if (!parse_cmdline(argc, argv))
         return -1;
+
+    milecsa::ErrorHandler error_handler =  [&](
+            milecsa::result code,
+            const std::string &error){
+        Logger::err->critical("Indexer: fault code[{}] {}", code, error);
+    };
+
+    statistic::Registry::Instance().set_error_handler(error_handler);
 
     auto db = milecsa::explorer::Db::Open();
 

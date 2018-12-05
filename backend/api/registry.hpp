@@ -8,6 +8,7 @@
 #include "jsonrpc/router.hpp"
 #include "api/params.hpp"
 #include "db.hpp"
+#include "config.hpp"
 
 #include <milecsa.hpp>
 
@@ -17,24 +18,6 @@
 #include <thread>
 
 namespace milecsa::rpc::server {
-
-    template <typename T>
-    class Singleton
-    {
-    public:
-        static T& Instance()
-        {
-            static T instance;
-            return instance;
-        }
-
-    protected:
-        Singleton() {}
-        ~Singleton() {}
-    public:
-        Singleton(Singleton const &) = delete;
-        Singleton& operator=(Singleton const &) = delete;
-    };
 
     struct registry {
 
@@ -69,9 +52,9 @@ namespace milecsa::rpc::server {
         static std::optional<milecsa::ErrorHandler> error_handler_;
     };
 
-    class Registry:public Singleton<registry>
+    class Registry:public milecsa::explorer::Singleton<registry>
     {
-        friend class Singleton<registry>;
+        friend class milecsa::explorer::Singleton<registry>;
     private:
         Registry(){};
     };
