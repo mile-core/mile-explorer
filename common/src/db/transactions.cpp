@@ -14,22 +14,7 @@
 using namespace milecsa::explorer;
 using namespace std;
 
-void Db::block_changes(const db::Data &block, uint256_t id, time_t t) {
-
-    try {
-        db::Data trx = block.at("transactions");
-        Db::log->trace("Db: get transactions {}... {} ", db_name_.c_str(), trx.dump());
-
-        add_transactions(trx, id, t);
-
-    }
-    catch (db::Timeout &e) {
-        Db::err->warn("Db: {} timeout get changes {}", db_name_.c_str(), e.what());
-    }
-    catch (db::Error &e) {
-        Db::err->error("Db: {} error processing get changes {}", db_name_.c_str(), e.message);
-    }
-}
+dispatch::Queue Db::transactions_queue_ = dispatch::Queue(config::block_processin_queue_size);
 
 inline void replace_keys(const string &key_from, const string &key_to,  db::Data &trx){
     if (trx.count(key_from)>0){
@@ -77,11 +62,11 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx,
 
         std::string uniq_id = entry.second;
 
-        db::Data row = db::Table::Open(*this, table::name::transactions_processing)
+        db::Data row = open_table(table::name::transactions_processing)
                 ->cursor().get(id).get_data();
 
         if (row.count("id")>0) {
-            Db::log->trace("Processing: stream transaction already is in table {}", row.dump());
+            Db::log->trace("Stream transactions processing: stream transaction already is in table {}", row.dump());
             continue;
         }
 
@@ -108,7 +93,7 @@ uint64_t Db::add_stream_transaction(const db::Data &input_trx,
 
         output_trx.push_back(trx);
 
-        Db::log->trace("Processing: stream transactions {}", trx.dump());
+        Db::log->trace("Stream transactions processing: stream transactions {}", trx.dump());
 
         count ++;
     }
@@ -141,10 +126,10 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id, time_t 
                 {"transactions", transactions_col}
         };
 
-        db::Table::Open(*this, table::name::wallets)->update(entry.first, query);
+        open_table(table::name::wallets)->update(entry.first, query);
 
         if (trx.count("to")>0){
-            db::Table::Open(*this, table::name::wallets)->update(trx["to"], query);
+            open_table(table::name::wallets)->update(trx["to"], query);
         }
     }
 }
@@ -159,7 +144,7 @@ void Db::add_transactions(const db::Data &transactions, uint256_t block_id, time
                 count++ ;
             }
 
-            Db::log->info("Processing: {} wallet transactions are processed", count);
+            Db::log->info("Wallet transactions processing: {} wallet transactions are processed", count);
         });
 
         transactions_queue_.async([=] {
@@ -172,9 +157,9 @@ void Db::add_transactions(const db::Data &transactions, uint256_t block_id, time
                 count += add_stream_transaction(trx, block_id, t, stream);
             }
 
-            db::Table::Open(*this, table::name::transactions_processing)->insert(stream);
+            open_table(table::name::transactions_processing)->insert(stream);
 
-            Db::log->info("Processing: {} transactions are processed, block-id: {}", count, UInt256ToDecString(block_id));
+            Db::log->info("Stream transactions processing: {} transactions are processed, block-id: {}", count, UInt256ToDecString(block_id));
         });
     }
     else {
@@ -188,8 +173,8 @@ void Db::add_transactions(const db::Data &transactions, uint256_t block_id, time
         stream["transaction-type"] = "__processing__";
         stream["timestamp"] = t;
 
-        db::Table::Open(*this, table::name::transactions_processing)->insert(stream);
+        open_table(table::name::transactions_processing)->insert(stream);
 
-        Db::log->trace("Processing: block-id: {} transactions is empty", id);
+        Db::log->trace("Stream transactions processing: block-id: {} transactions is empty", id);
     }
 }

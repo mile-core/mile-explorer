@@ -10,6 +10,8 @@
 #            "https://trnt01.t.mile.global/v1/api"]
 
 #node_urls: ["http://lotus000.testnet.mile.global/v1/api",
+#            "http://lotus001.testnet.mile.global/v1/api",
+#            "http://lotus000.testnet.mile.global/v1/api",
 #            "http://lotus001.testnet.mile.global/v1/api"]
 
 node_urls: ["https://lotus000.i.mile.global/v1/api",
@@ -17,13 +19,18 @@ node_urls: ["https://lotus000.i.mile.global/v1/api",
             "https://lotus002.i.mile.global/v1/api",
             "https://00.node.mile.global/v1/api"]
 
+#node_urls: ["https://lotus000.i.mile.global/v1/api",
+#            "https://lotus001.i.mile.global/v1/api",
+#            "https://lotus002.i.mile.global/v1/api",
+#            "https://00.node.mile.global/v1/api"]
+
 #
 # Processing options
 #
 request_timeout: 100  # msec.
-update_timeout:  20  # sec.
+update_timeout:  15   # sec.
 rpc_connection_timeout:  10  # sec.
-rpc_queue_size:  48
+rpc_queue_size:  128
 block_processin_queue_size: 4
 
 #

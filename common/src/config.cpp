@@ -29,6 +29,7 @@ int config::block_processin_queue_size = 12;
 time_t config::update_timeout   = 20;
 time_t config::request_timeout  = 20;
 time_t config::rpc_connection_timeout = 5;
+time_t config::procesing_refresh_time = 1;
 ///
 /// Http
 ///

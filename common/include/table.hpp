@@ -49,7 +49,7 @@ namespace milecsa::explorer {
              * Get table cursor to select data
              * @return
              */
-            Cursor cursor() const;
+            Cursor cursor(bool outdated = true) const;
 
             /**
              * Test index with field name

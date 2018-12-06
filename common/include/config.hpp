@@ -65,6 +65,8 @@ namespace milecsa::explorer {
 
         static time_t rpc_connection_timeout; // sec.
 
+        static time_t procesing_refresh_time;  // sec.
+
         ///
         /// Backend
         ///

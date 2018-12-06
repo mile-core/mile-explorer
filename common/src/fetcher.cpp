@@ -42,7 +42,7 @@ optional<milecsa::rpc::Client> Fetcher::get_rpc() {
     //auto url = urls_[random(0,urls_.size()-1)];
     auto url = urls_[counter++ % urls_.size()];
 
-    Fetcher::log->debug("Fetcher: get rpc connection: {}", url);
+    Fetcher::log->trace("Fetcher: get rpc connection: {}", url);
 
     auto c = milecsa::rpc::Client::Connect(
             url,
@@ -98,10 +98,11 @@ void Fetcher::run(uint256_t block_id) {
                 //
                 optional<uint256_t> next_block_id = client->get_current_block_id();
 
-                Logger::log->info("Fetcher: next block: {}", UInt256ToDecString(first));
-
                 if (next_block_id) {
+
                     uint256_t last = *next_block_id;
+
+                    Logger::log->info("Fetcher: current block: {}, processing from: {}", UInt256ToDecString(last), UInt256ToDecString(first));
 
                     Fetcher::log->debug(
                             "Getting block ids: [{}:{}], block fetcher queue is busy: {}",
