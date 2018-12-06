@@ -2,14 +2,14 @@
 // Created by lotus mile on 29/10/2018.
 //
 
-#include <rethinkdb.h>
 #include <any>
-
 #include <milecsa_queue.h>
+#include <milecsa.hpp>
+
 #include "db.hpp"
 #include "table.hpp"
 #include "names.hpp"
-#include <milecsa.hpp>
+#include "statistics.hpp"
 
 namespace milecsa::explorer::db {
     void migration(optional<Db> db);
@@ -18,8 +18,6 @@ namespace milecsa::explorer::db {
 using namespace milecsa::explorer;
 using namespace std;
 
-dispatch::Queue Db::transactions_update_index_queue_ = dispatch::Queue(1);
-dispatch::Queue Db::transactions_queue_ = dispatch::Queue(config::block_processin_queue_size);
 dispatch::Queue Db::common_processing_queue_ = dispatch::Queue(config::block_processin_queue_size);
 
 optional<Db> Db::Open(const std::string &db_name, const std::string &host, int port) {
@@ -190,19 +188,20 @@ bool Db::init() {
 
         Db::log->info("Db: {} is opened ...", db_name_.c_str());
 
+        blocks_processing();
+
         transactions_processing();
 
-        //
-        // TODO: create common processing registry
-        //
         common_processing_queue_.async([&]{
             while (common_processing_queue_.is_running()) {
                 std::this_thread::sleep_for(std::chrono::seconds(config::update_timeout));
 
                 //
-                // 1. turnovers processing
-                //
-                turnovers_processing();
+                // process statistics
+
+                for (auto &[name, method]: statistic::Registry::Instance().get_statistics()){
+                    method(*this);
+                }
             }
         });
 
@@ -212,174 +211,4 @@ bool Db::init() {
     }
 
     return init_db;
-}
-
-void Db::turnovers_processing() {
-
-    try {
-
-        auto state = get_block_history_state();
-        time_t last = state["timestamp"];
-        time_t first = last - 86400;
-
-        db::Data items = open_table(table::name::blocks)
-                ->cursor()
-                .between(first, last, "timestamp")
-                .field("transactions")
-                .get_data();
-
-        Db::log->info("Db: {} turnovers processing items: {}", db_name_.c_str(), items.size());
-
-        long double xdr  = 0;
-        long double mile = 0;
-        uint64_t count = 0;
-        uint64_t count_xdr = 0;
-        uint64_t count_mile = 0;
-        for (auto &item: items) {
-            if (item.is_array()) {
-                for (auto &trx: item) {
-                    if (trx.count("asset")){
-                        for(auto &asset: trx["asset"]){
-                            std::string code = asset["code"];
-                            std::string amount = asset["amount"];
-                            unsigned short asset_code = (unsigned short )std::stoi(code);
-                            if (asset_code == milecsa::assets::XDR.code){
-                                xdr +=  std::stold(amount);
-                                count_xdr ++;
-                            }
-                            else if (asset_code == milecsa::assets::MILE.code){
-                                mile += std::stold(amount);
-                                count_mile ++;
-                            }
-                            count++;
-                        }
-                    }
-                }
-            }
-        }
-
-        db::Data trnv = {
-                {"id", "turnovers-24"},
-                {"count", count},
-                {"assets", {
-                                   {{"code",std::to_string(milecsa::assets::XDR.code)},{"amount",xdr},{"count",count_xdr}},
-                                   {{"code",std::to_string(milecsa::assets::MILE.code)},{"amount",mile},{"count",count_mile}},
-                }}
-        };
-        open_table(table::name::turnovers)->update(trnv);
-
-        Db::log->trace("Db: {} turnovers processing done: {}", db_name_.c_str(), trnv.dump());
-    }
-    catch (db::Error &e) {
-        Db::err->error("Db: {} turnovers processing error {}", db_name_.c_str(), e.message);
-    }
-    catch (...) {
-        Db::err->error("Db: turnovers processing unknown error ... ");
-    }
-}
-
-void Db::transactions_processing() {
-
-    transactions_update_index_queue_.async([&]{
-
-        dispatch::Queue update_stream_q(8);
-
-        uint64_t prev_bid = 0;
-
-        while (transactions_update_index_queue_.is_running()) {
-
-            try{
-
-                auto update_state = [=](Db *db, uint64_t count, uint64_t block_id){
-                    db::Data state = {
-                            {"id", "state"},
-                            {"count", count},
-                            {"block-id", block_id}
-                    };
-                    open_table(table::name::transactions_state)->update(state);
-                };
-
-                db::Data items = open_table(table::name::transactions_processing)
-                        ->cursor()
-                        .sort("block-id")
-                        .get_data();
-
-                uint64_t last_count = 0 ;
-
-                try {
-                    last_count = get_transaction_history_state();
-                }
-                catch(...){
-                    update_state(this, 0, 0);
-                }
-
-                uint64_t count = 0;
-
-                Db::log->info("Db: {} transactions processing queue reading items: {}",
-                        db_name_.c_str(), items.size());
-
-                for (auto &item: items) {
-
-                    uint64_t    bid   = item["block-id"];
-                    std::string trxid = item["id"];
-
-                    if (prev_bid>0) {
-
-                        if (item.at("transaction-type") == "__processing__") {
-                            Db::log->trace("Processing: transaction {} processing type, will be skipped", trxid);
-                            prev_bid = bid;
-                            open_table(table::name::transactions_processing)->cursor().remove(trxid);
-                            continue;
-                        }
-
-                        if ((bid-prev_bid)>1) {
-                            Db::log->debug("Processing: transaction {} is in a forward block {} while current is {}", trxid, bid, prev_bid);
-                            prev_bid = bid;
-                            break;
-                        }
-
-                    }
-                    else if (item.at("transaction-type") == "__processing__") {
-                        prev_bid = bid;
-                        open_table(table::name::transactions_processing)->cursor().remove(trxid);
-                        continue;
-                    }
-
-                    prev_bid = bid;
-
-                    db::Data row = db::Table::Open(*this, table::name::transactions)
-                            ->cursor().get(trxid).get_data();
-
-                    if (row.count("id")>0) {
-                        Db::log->trace("Processing: transaction {} already is in table {}", trxid, row.dump());
-                        open_table(table::name::transactions_processing)->cursor().remove(trxid);
-                        continue;
-                    }
-
-                    item["serial"] = last_count++;
-
-                    open_table(table::name::transactions)->insert(item);
-
-                    update_state(this, last_count, bid);
-
-                    open_table(table::name::transactions_processing)->cursor().remove(trxid);
-
-                    Db::log->debug("Db: {} transaction serial number updated: {}, block-id: {}",
-                                   db_name_.c_str(), last_count, bid);
-
-                    count++;
-                }
-                if (count>0)
-                    Db::log->info("Db: {} transactions are updated: {}", db_name_.c_str(), count);
-            }
-            catch (db::Error &e) {
-                Db::err->error("Db: {} error transactions update index {}", db_name_.c_str(), e.message);
-            }
-            catch (...) {
-                Db::err->error("Db: transactions updating index unknown error ... ");
-            }
-
-            std::this_thread::sleep_for(std::chrono::seconds(config::update_timeout));
-        }
-    });
 }

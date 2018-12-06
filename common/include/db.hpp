@@ -202,7 +202,7 @@ namespace milecsa::explorer{
         void add_wallet_transaction(const db::Data &transactions, uint256_t block_id, time_t t);
 
         void transactions_processing();
-
+        void blocks_processing();
         void turnovers_processing();
 
         /// < -
@@ -217,7 +217,8 @@ namespace milecsa::explorer{
 
         static dispatch::Queue common_processing_queue_;
         static dispatch::Queue transactions_queue_;
-        static dispatch::Queue transactions_update_index_queue_;
+        static dispatch::Queue transaction_processing_queue_;
+        static dispatch::Queue blocks_processing_queue_;
 
     };
 }

@@ -45,12 +45,17 @@ void db::Table::create_indices(const vector<string> &indices) {
     }
 }
 
-db::Cursor db::Table::cursor() const {
+db::Cursor db::Table::cursor(bool outdated) const {
     try {
         db::Result q = db_->query();
+        if (outdated)
         return  db::Cursor(
                 q.table(name_, db::Driver::optargs("read_mode", "outdated")),
                 std::move(db_));
+        else
+            return  db::Cursor(
+                    q.table(name_),
+                    std::move(db_));
     }
     catch (db::Error &e) {
         Db::err->error("Table: {} error get cursor: {}", name_, e.message);

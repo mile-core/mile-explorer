@@ -65,6 +65,8 @@ namespace milecsa::explorer {
 
         static time_t rpc_connection_timeout; // sec.
 
+        static time_t procesing_refresh_time;  // sec.
+
         ///
         /// Backend
         ///
@@ -80,6 +82,24 @@ namespace milecsa::explorer {
          */
         static int            rpc_pool_size;
 
+    };
+
+    template <typename T>
+    class Singleton
+    {
+    public:
+        static T& Instance()
+        {
+                static T instance;
+                return instance;
+        }
+
+    protected:
+        Singleton() {}
+        ~Singleton() {}
+    public:
+        Singleton(Singleton const &) = delete;
+        Singleton& operator=(Singleton const &) = delete;
     };
 }
 

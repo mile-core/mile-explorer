@@ -22,11 +22,12 @@ void Db::add_block(const db::Data &_block, uint256_t block_id) {
         db::Data block = _block;
 
         {
-            db::Data row = db::Table::Open(*this, table::name::blocks)
+            db::Data row = open_table(table::name::blocks_processing)
                     ->cursor().get(id).get_data();
 
             if (row.count("id")>0){
                 Db::log->trace("Processing: block {} already is in table",  id);
+                return;
             }
 
             block["block-id"]  = std::stoull(id);
@@ -38,23 +39,30 @@ void Db::add_block(const db::Data &_block, uint256_t block_id) {
 
             block["index-timestamp"] = tm;
 
-            db::Table::Open(*this, table::name::blocks)->insert(block);
-
-            db::Data state;
-            state["id"] = id;
-            state["block-id"] = std::stoull(id);
-
-            db::Table::Open(*this, table::name::blockchain_state)->insert(state);
+            open_table(table::name::blocks_processing)->insert(block);
         }
-
-        block_changes(block, block_id, block["timestamp"]);
-
-        Db::log->debug("Db: {} block-id: {} processed", db_name_.c_str(),id);
     }
     catch (db::Error &e) {
         Db::err->error("Db: {} error processing add block {}", db_name_.c_str(), e.message);
     }
     catch (std::exception &e) {
         Db::err->error("Db: {} error processing add block {}", db_name_.c_str(), e.what());
+    }
+}
+
+void Db::block_changes(const db::Data &block, uint256_t id, time_t t) {
+
+    try {
+        db::Data trx = block.at("transactions");
+        Db::log->trace("Db: get transactions {}... {} ", db_name_.c_str(), trx.dump());
+
+        add_transactions(trx, id, t);
+
+    }
+    catch (db::Timeout &e) {
+        Db::err->warn("Db: {} timeout get changes {}", db_name_.c_str(), e.what());
+    }
+    catch (db::Error &e) {
+        Db::err->error("Db: {} error processing get changes {}", db_name_.c_str(), e.message);
     }
 }
