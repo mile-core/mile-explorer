@@ -19,7 +19,8 @@ namespace milecsa::explorer::table {
                 name::transactions,
                 name::transactions_state,
                 name::transactions_processing,
-                name::turnovers
+                name::turnovers,
+                name::transaction_turnover
         };
 
         return names;

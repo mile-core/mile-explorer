@@ -12,6 +12,8 @@ file (GLOB COMMON_SRC ${COMMON_SRC}
         ../common/src/*.cpp
         ../common/src/db/*.cpp
         ../common/src/db/migrations/*.cpp
+        ../common/src/db/blocks/*.cpp
+        ../common/src/db/transactions/*.cpp
         )
 
 add_library(${CURRENT_TARGET_NAME} ${COMMON_SRC})

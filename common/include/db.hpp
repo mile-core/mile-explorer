@@ -92,9 +92,22 @@ namespace milecsa::explorer{
          */
         Db::Table open_table(const std::string &name) const;
 
+        /**
+         * Delete table
+         * @param name table name
+         */
         void delete_table(const std::string &name);
 
+        /**
+         * Get migration version
+         * @return version number
+         */
         unsigned int get_version() const;
+
+        /**
+         * Update migration version number
+         * @param version
+         */
         void update_version(unsigned int version);
 
         /**
@@ -155,8 +168,16 @@ namespace milecsa::explorer{
          */
         db::Data get_nodes(uint64_t first_id, uint64_t limit) const ;
 
+        /**
+         * Get blockchain metadata
+         * @return blockchain info
+         */
         db::Data get_blockchain_info() const ;
 
+        /**
+         * Blockchain history state
+         * @return bocks state
+         */
         db::Data get_block_history_state() const ;
         db::Data get_block_history(uint64_t first_id, uint64_t limit) const;
         db::Data get_block_by_id(uint256_t id) const;

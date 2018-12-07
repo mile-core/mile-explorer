@@ -131,10 +131,10 @@ Db::Table Db::create_table(const std::string &name) {
     try {
         auto connection = get_connection();
         query().table_create(name).run(*connection);
-        return db::Table::Open(*this, name);
+        return open_table(name);
     }
     catch (db::Error &e) {
-        return db::Table::Open(*this, name);
+        return open_table(name);
     }
 }
 
@@ -199,8 +199,33 @@ bool Db::init() {
                 //
                 // process statistics
 
+                auto state  = get_block_history_state();
+                time_t last = state["timestamp"];
+
                 for (auto &[name, method]: statistic::Registry::Instance().get_statistics()){
-                    method(*this);
+                    try {
+
+                        method(*this, last);
+                        Logger::log->info("Statistic: {} processing done", name);
+                    }
+                    catch (db::Error &e) {
+                        Logger::err->error("Statistic: {} processing error {}", name, e.message);
+                    }
+                    catch(nlohmann::json::parse_error& e) {
+                        Logger::err->error("Statistic: {} parse json error {}", name, e.what());
+                    }
+                    catch(nlohmann::json::invalid_iterator& e){
+                        Logger::err->error("Statistic: {} invalid iterator error {}", name, e.what());
+                    } catch(nlohmann::json::type_error & e){
+                        Logger::err->error("Statistic: {} type error {}", name, e.what());
+                    } catch(nlohmann::json::out_of_range& e){
+                        Logger::err->error("Statistic: {} out of range error {}", name, e.what());
+                    } catch(nlohmann::json::other_error& e){
+                        Logger::err->error("Statistic: {} other error {}", name, e.what());
+                    }
+                    catch (...) {
+                        Logger::err->error("Statistic: {} turnovers processing unknown error ... ", name);
+                    }
                 }
             }
         });

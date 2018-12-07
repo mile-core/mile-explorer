@@ -30,7 +30,7 @@ node_urls: ["https://lotus000.i.mile.global/v1/api",
 request_timeout: 100  # msec.
 update_timeout:  15   # sec.
 rpc_connection_timeout:  10  # sec.
-rpc_queue_size:  128
+rpc_queue_size:  24
 block_processin_queue_size: 4
 
 #

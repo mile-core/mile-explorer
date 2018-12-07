@@ -82,7 +82,7 @@ void Db::transactions_processing() {
 
                     prev_bid = bid;
 
-                    db::Data row = db::Table::Open(*this, table::name::transactions)
+                    db::Data row = open_table(table::name::transactions)
                             ->cursor().get(trxid).get_data();
 
                     if (row.count("id")>0) {
@@ -99,7 +99,7 @@ void Db::transactions_processing() {
 
                     open_table(table::name::transactions_processing)->cursor().remove(trxid);
 
-                    Db::log->debug("Db: {} transaction serial number updated: {}, block-id: {}",
+                    Db::log->debug("Transaction processing: {} transaction serial number updated: {}, block-id: {}",
                                    db_name_.c_str(), last_count, bid);
 
                     count++;

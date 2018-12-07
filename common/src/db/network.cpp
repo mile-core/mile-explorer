@@ -13,12 +13,28 @@
 using namespace milecsa::explorer;
 using namespace std;
 
-void Db::update_info(const milecsa::explorer::db::Data &blockchain_info) {
+void Db::update_info(const milecsa::explorer::db::Data &_blockchain_info) {
+    db::Data blockchain_info = _blockchain_info;
+    auto &assets = blockchain_info.at("supported-assets");
+
+    if (assets.is_array()) {
+        for (uint i = 0; i < assets.size(); i++) {
+            if (assets[i].count("code")) {
+                auto code = assets[i]["code"].get<string>();
+                if ("0" == code)
+                    assets[i]["ticker-name"] = "XDR";
+                else if ("1" == code)
+                    assets[i]["ticker-name"] = "MILE";
+            }
+        }
+    }
+
     db::Data info = {
             {"info", blockchain_info},
             {"id", blockchain_info["version"]}
     };
-    db::Table::Open(*this, table::name::blockchain_info)->insert(info);
+
+    open_table(table::name::blockchain_info)->update(info);
     Db::log->info("Db: {} blockchain info snapshot: ", db_name_, info.dump());
 }
 
@@ -32,7 +48,7 @@ void Db::add_node_states(const db::Data &nodes_state, uint256_t block_id){
             {"id", id},
     };
 
-    db::Table::Open(*this, table::name::node_states)->insert(states);
+    open_table(table::name::node_states)->insert(states);
 
     Db::log->trace("Db: {} node states: {} block id {}", db_name_, states.dump(), id);
 
@@ -47,7 +63,7 @@ void Db::add_node_states(const db::Data &nodes_state, uint256_t block_id){
                 {"id", pid}
         };
 
-        db::Table::Open(*this, table::name::node_wallets)->update(node);
+        open_table(table::name::node_wallets)->update(node);
 
         Db::log->trace("Db: {} node wallet[{}]: {}", db_name_, pid, node.dump());
     }
