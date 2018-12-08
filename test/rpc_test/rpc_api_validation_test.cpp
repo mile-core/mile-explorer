@@ -17,7 +17,8 @@ static const nlohmann::json tests = R"([
   {"method": "help",                     "params": {} },
   {"method": "ping",                     "params": {} },
   {"method": "get-blockchain-info",      "params": {} },
-  {"method": "get-turnovers",            "params": {} },
+  {"method": "get-statistics-list",      "params": {} },
+  {"method": "get-statistics",           "params": {"name":"transaction-turnover"} },
   {"method": "get-block-history-state",  "params": {} },
   {"method": "get-block-history",        "params": {"first":0, "limit":3}},
   {"method": "get-block",                "params": {"id":2}},
@@ -206,4 +207,12 @@ BOOST_FIXTURE_TEST_CASE( get_wallet_history_blocks, SessionEval )
 BOOST_FIXTURE_TEST_CASE( get_wallet_history_transactions, SessionEval )
 {
     BOOST_CHECK(run_tests("get-wallet-history-transactions"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_statistics_lits, SessionEval ) {
+    BOOST_CHECK(run_tests("get-statistics-list"));
+}
+
+BOOST_FIXTURE_TEST_CASE( get_statistics, SessionEval ) {
+    BOOST_CHECK(run_tests("get-statistics"));
 }

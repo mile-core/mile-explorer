@@ -176,10 +176,3 @@ db::Data Db::get_transaction_by_digest(const string &id) const{
             .get(id, "digest")
             .get_data();
 }
-
-db::Data Db::get_turnovers_24() const {
-    return open_table(table::name::turnovers)
-            ->cursor()
-            .get("turnovers-24")
-            .get_data();
-}

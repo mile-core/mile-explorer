@@ -201,12 +201,6 @@ namespace milecsa::explorer{
         db::Data get_transaction_by_id(const string &id) const;
         db::Data get_transaction_by_digest(const string &id) const;
 
-        /**
-         * Get turnover for 24 hours stats
-         * @return
-         */
-        db::Data get_turnovers_24() const;
-
     protected:
         const db::Connection get_connection() const;
 
