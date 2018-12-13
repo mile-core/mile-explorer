@@ -3,6 +3,7 @@
 //
 #pragma once
 #include "statistics.hpp"
+#include "fetcher.hpp"
 #include <map>
 
 template <typename T>

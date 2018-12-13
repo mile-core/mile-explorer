@@ -220,8 +220,10 @@ namespace milecsa::explorer{
         uint64_t add_stream_transaction(const db::Data &imput_trx,
                 uint256_t block_id, time_t t, db::Data &output_trx);
 
-
         void add_wallet_transaction(const db::Data &transactions, uint256_t block_id, time_t t);
+
+        void update_wallets_state();
+        void update_wallet_state(const std::string &public_key);
 
         void transactions_processing();
         void blocks_processing();

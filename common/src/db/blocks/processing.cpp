@@ -98,4 +98,6 @@ void Db::update_genesis(const db::Data &genesis){
     }
 
     Db::log->info("Genesis: wallet transactions processing: {} wallet transactions are processed", count);
+
+    update_wallets_state();
 }

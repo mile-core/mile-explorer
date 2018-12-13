@@ -129,8 +129,12 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id, time_t 
 
         open_table(table::name::wallets)->update(entry.first, query);
 
+        update_wallet_state(entry.first);
+
         if (trx.count("to")>0){
-            open_table(table::name::wallets)->update(trx["to"], query);
+            auto k = trx["to"].get<string>();
+            open_table(table::name::wallets)->update(k, query);
+            update_wallet_state(k);
         }
     }
 }
