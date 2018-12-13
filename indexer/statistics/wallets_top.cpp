@@ -51,7 +51,7 @@ static auto method = [](const ctxDb &db, time_t last) {
             ->cursor()
             .get_data();
 
-    auto filter = [&items](const milecsa::token& token, std::vector<std::pair<std::string,float>> &result) {
+    auto filter = [&items](const milecsa::token& token, std::vector<std::pair<std::string,std::string>> &result) {
 
         std::for_each(items.begin(), items.end(), [&result,token](db::Data a) {
             if (a.count("balance") == 0)
@@ -68,42 +68,42 @@ static auto method = [](const ctxDb &db, time_t last) {
                 auto x = coin["code"].get<std::string>();
 
                 if (std::stoi(x) == token.code) {
-                    result.push_back(std::pair<std::string, float>(a["id"], std::stof(coin["amount"].get<std::string>())));
+                    result.push_back(std::pair<std::string, std::string>(a["id"], coin["amount"].get<std::string>()));
                 }
             }
         });
     };
 
-    std::vector<std::pair<std::string,float>> xdr;
-    std::vector<std::pair<std::string,float>> mile;
+    std::vector<std::pair<std::string,std::string>> xdr;
+    std::vector<std::pair<std::string,std::string>> mile;
 
     filter(milecsa::assets::XDR,xdr);
     filter(milecsa::assets::MILE,mile);
 
     std::sort(xdr.begin(), xdr.end(),
-         [](const std::pair<std::string,float> & a, const std::pair<std::string,float> & b) -> bool
+         [](const std::pair<std::string,std::string> & a, const std::pair<std::string,std::string> & b) -> bool
          {
-            return a.second>b.second;
+             return std::stof(a.second)>std::stof(b.second);
          });
 
     std::sort(mile.begin(), mile.end(),
-              [](const std::pair<std::string,float> & a, const std::pair<std::string,float> & b) -> bool
+              [](const std::pair<std::string,std::string> & a, const std::pair<std::string,std::string> & b) -> bool
               {
-                  return a.second>b.second;
+                  return std::stof(a.second)>std::stof(b.second);
               });
 
     xdr  = mslice(xdr, 0, 512);
     mile = mslice(mile,0, 512);
 
-    auto update = [&](std::vector<std::pair<std::string,float>> &slice, const std::string &table){
+    auto update = [&](std::vector<std::pair<std::string,std::string>> &slice, const std::string &table){
         uint64_t count = 0;
+
         for (auto &item: slice) {
 
-            std::cerr << "["<<count<<"] : " << item.first << " : " << item.second << std::endl;
-
             db::Data trx = {
+                    {"id", std::to_string(count)},
                     {"position", count},
-                    {"id", item.first},
+                    {"public-key", item.first},
                     {"amount", item.second}
             };
 
