@@ -38,21 +38,7 @@ optional<Fetcher> Fetcher::Connect(
 }
 
 optional<milecsa::rpc::Client> Fetcher::get_rpc() {
-
-    static uint64_t counter = 0;
-
-    //auto url = urls_[random(0,urls_.size()-1)];
-    auto url = urls_[counter++ % urls_.size()];
-
-    Fetcher::log->trace("Fetcher: get rpc connection: {}", url);
-
-    auto c = milecsa::rpc::Client::Connect(
-            url,
-            true,
-            Fetcher::response_fail_handler,
-            Fetcher::error_handler);
-
-    return std::move(c);
+    return milecsa::explorer::get_rpc(urls_);
 }
 
 optional<Db> &Fetcher::get_db() {

@@ -1,1 +1,1 @@
-mile-explorer 1.4.1
+mile-explorer 1.4.2

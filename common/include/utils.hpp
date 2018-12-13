@@ -12,6 +12,7 @@
 #include <sstream>
 #include <optional>
 #include <milecsa_jsonrpc.hpp>
+#include "config.hpp"
 
 namespace milecsa::explorer{
     int random(int min, int max);
@@ -30,5 +31,5 @@ namespace milecsa::explorer{
 
     std::string utcToString(std::time_t t);
 
-    std::optional<milecsa::rpc::Client> get_rpc();
+    std::optional<milecsa::rpc::Client> get_rpc(const std::vector<std::string> &node_urls=milecsa::explorer::config::node_urls);
 };
