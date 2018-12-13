@@ -9,7 +9,21 @@
 #include <array>
 
 template <typename T>
-std::vector<T> mslice(const std::vector<T>& v, int start=0, int end=-1) {
+std::vector<T> mslice(std::vector<T> v, int start=0, int end=-1) {
+
+    std::sort(v.begin(), v.end(),
+              [](const std::pair<std::string,std::string> & a, const std::pair<std::string,std::string> & b) -> bool
+              {
+                  return std::stof(a.second)>std::stof(b.second);
+              });
+
+    auto it = std::unique(v.begin(), v.end(), [](const T& a, const T& b) -> bool
+    {
+        return a.first == b.first;
+    });
+
+    v.erase(it,v.end());
+
     int oldlen = v.size();
     int newlen;
 
@@ -24,6 +38,7 @@ std::vector<T> mslice(const std::vector<T>& v, int start=0, int end=-1) {
     for (int i=0; i<newlen; i++) {
         nv[i] = v[start+i];
     }
+
     return nv;
 }
 
@@ -80,20 +95,8 @@ static auto method = [](const ctxDb &db, time_t last) {
     filter(milecsa::assets::XDR,xdr);
     filter(milecsa::assets::MILE,mile);
 
-    std::sort(xdr.begin(), xdr.end(),
-         [](const std::pair<std::string,std::string> & a, const std::pair<std::string,std::string> & b) -> bool
-         {
-             return std::stof(a.second)>std::stof(b.second);
-         });
-
-    std::sort(mile.begin(), mile.end(),
-              [](const std::pair<std::string,std::string> & a, const std::pair<std::string,std::string> & b) -> bool
-              {
-                  return std::stof(a.second)>std::stof(b.second);
-              });
-
-    xdr  = mslice(xdr, 0, 512);
-    mile = mslice(mile,0, 512);
+    xdr  = mslice(xdr, 0, 1024);
+    mile = mslice(mile,0, 1024);
 
     auto update = [&](std::vector<std::pair<std::string,std::string>> &slice, const std::string &table){
         uint64_t count = 0;
