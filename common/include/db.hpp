@@ -76,14 +76,14 @@ namespace milecsa::explorer{
          * @param name table name
          * @return false if table is not exist
          */
-        bool has_table(const std::string &name);
+        bool has_table(const std::string &name) const;
 
         /**
          * Create table
          * @param name table name
          * @return true if table is created
          */
-        Db::Table create_table(const std::string &name);
+        Db::Table create_table(const std::string &name) const ;
 
         /**
          * Open or create new table
