@@ -7,7 +7,7 @@ set (TEST condition_map_${PROJECT_NAME})
 
 add_executable(${TEST} ${TESTS_SOURCES})
 
-set(MILECSA_LIBS milecsa)
+set(MILECSA_LIBS milecsa milecsa_jsonrpc)
 
 target_link_libraries (
         ${TEST}
