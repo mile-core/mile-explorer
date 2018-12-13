@@ -79,3 +79,25 @@ void Db::blocks_processing() {
         }
     });
 }
+
+
+void Db::update_genesis(const db::Data &genesis){
+
+    uint64_t count = 0 ;
+
+    for ( auto trx: genesis ) {
+        add_wallet_transaction(trx, 0, 0);
+        std::string id = trx["public-key"].get<std::string>();
+        id.append(":");
+        id.append("0");
+        id.append(":");
+        id.append(trx["transaction-id"].get<std::string>());
+        trx["serial"] = count;
+        open_table(table::name::genesis_transactions)->update(id,trx);
+        count++ ;
+    }
+
+    Db::log->info("Genesis: wallet transactions processing: {} wallet transactions are processed", count);
+
+    update_wallets_state();
+}

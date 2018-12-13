@@ -48,7 +48,8 @@ inline map<string,string> find_public_keys(const db::Data &trx, std::string bloc
     return ret;
 }
 
-uint64_t Db::add_stream_transaction(const db::Data &input_trx,
+uint64_t Db::add_stream_transaction(
+        const db::Data &input_trx,
         uint256_t block_id, time_t t,
         db::Data &output_trx) {
 
@@ -128,8 +129,12 @@ void Db::add_wallet_transaction(const db::Data &trx, uint256_t block_id, time_t 
 
         open_table(table::name::wallets)->update(entry.first, query);
 
+        update_wallet_state(entry.first);
+
         if (trx.count("to")>0){
-            open_table(table::name::wallets)->update(trx["to"], query);
+            auto k = trx["to"].get<string>();
+            open_table(table::name::wallets)->update(k, query);
+            update_wallet_state(k);
         }
     }
 }

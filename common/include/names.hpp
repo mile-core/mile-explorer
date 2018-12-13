@@ -24,11 +24,13 @@ namespace milecsa::explorer{
             constexpr const char *blocks             = "blocks";
             constexpr const char *blocks_processing  = "blocks_processing";
             constexpr const char *wallets            = "wallets";
+            constexpr const char *wallets_state      = "wallets_state";
             constexpr const char *transactions       = "transactions";
-            constexpr const char *transactions_state = "transactions_state";
+            constexpr const char *genesis_transactions    = "genesis_transactions";
+            constexpr const char *transactions_state      = "transactions_state";
             constexpr const char *transactions_processing = "transactions_processing";
-            constexpr const char *turnovers          = "turnovers";
-            constexpr const char *transaction_turnover = "transaction_turnover";
+            constexpr const char *turnovers               = "turnovers";
+            constexpr const char *transaction_turnover    = "transaction_turnover";
         }
 
         namespace index {

@@ -76,14 +76,14 @@ namespace milecsa::explorer{
          * @param name table name
          * @return false if table is not exist
          */
-        bool has_table(const std::string &name);
+        bool has_table(const std::string &name) const;
 
         /**
          * Create table
          * @param name table name
          * @return true if table is created
          */
-        Db::Table create_table(const std::string &name);
+        Db::Table create_table(const std::string &name) const ;
 
         /**
          * Open or create new table
@@ -145,6 +145,12 @@ namespace milecsa::explorer{
          * @param block_id - ignoring at this version
          */
         void add_node_states(const db::Data &nodes_state, uint256_t block_id);
+
+        /**
+         * Update genesis
+         * @param genesis
+         */
+        void update_genesis(const db::Data &genesis);
 
         /**
          * Get the last block id indexed in DB
@@ -215,6 +221,9 @@ namespace milecsa::explorer{
                 uint256_t block_id, time_t t, db::Data &output_trx);
 
         void add_wallet_transaction(const db::Data &transactions, uint256_t block_id, time_t t);
+
+        void update_wallets_state();
+        void update_wallet_state(const std::string &public_key);
 
         void transactions_processing();
         void blocks_processing();

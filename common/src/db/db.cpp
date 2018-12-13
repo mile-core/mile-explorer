@@ -115,7 +115,7 @@ bool Db::is_exist() {
     return exists_;
 }
 
-bool Db::has_table(const std::string &name) {
+bool Db::has_table(const std::string &name) const {
     try {
         auto connection = get_connection();
         auto v = query().table_list().run(*connection).to_array();
@@ -127,7 +127,7 @@ bool Db::has_table(const std::string &name) {
     return false;
 }
 
-Db::Table Db::create_table(const std::string &name) {
+Db::Table Db::create_table(const std::string &name) const {
     try {
         auto connection = get_connection();
         query().table_create(name).run(*connection);
@@ -237,3 +237,4 @@ bool Db::init() {
 
     return init_db;
 }
+

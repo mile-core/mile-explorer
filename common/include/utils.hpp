@@ -10,6 +10,8 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <optional>
+#include <milecsa_jsonrpc.hpp>
 
 namespace milecsa::explorer{
     int random(int min, int max);
@@ -27,4 +29,6 @@ namespace milecsa::explorer{
     std::tm getTime(const std::string& dateTime, bool adjust_year = true);
 
     std::string utcToString(std::time_t t);
+
+    std::optional<milecsa::rpc::Client> get_rpc();
 };

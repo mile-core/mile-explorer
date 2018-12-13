@@ -5,9 +5,6 @@
 #
 # Scainning nodes
 #
-#node_urls: ["https://nyc03.t.mile.global/v1/api",
-#            "https://nyc01.t.mile.global/v1/api",
-#            "https://trnt01.t.mile.global/v1/api"]
 
 #node_urls: ["http://lotus000.testnet.mile.global/v1/api",
 #            "http://lotus001.testnet.mile.global/v1/api",
@@ -15,14 +12,15 @@
 #            "http://lotus001.testnet.mile.global/v1/api"]
 
 node_urls: ["https://lotus000.i.mile.global/v1/api",
-            "https://lotus001.i.mile.global/v1/api",
             "https://lotus002.i.mile.global/v1/api",
-            "https://00.node.mile.global/v1/api"]
+            "https://00.node.mile.global/v1/api",
+            "https://01.node.mile.global/v1/api",
+            "https://02.node.mile.global/v1/api"]
 
-#node_urls: ["https://lotus000.i.mile.global/v1/api",
-#            "https://lotus001.i.mile.global/v1/api",
-#            "https://lotus002.i.mile.global/v1/api",
-#            "https://00.node.mile.global/v1/api"]
+#
+# Genesis file
+#
+genesis_url: "https://raw.githubusercontent.com/mile-core/mile-files/master/genesis_block.txt"
 
 #
 # Processing options

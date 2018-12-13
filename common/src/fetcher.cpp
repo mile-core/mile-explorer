@@ -2,9 +2,11 @@
 // Created by lotus mile on 29/10/2018.
 //
 
+#include "milecsa_http.hpp"
 #include "fetcher.hpp"
 #include "db.hpp"
 #include "utils.hpp"
+#include "genesis.hpp"
 
 using namespace milecsa::explorer;
 using namespace std;
@@ -68,7 +70,7 @@ Fetcher::Fetcher(
          block_fetcher_task_(new Task("block-fetcher", config::block_processin_queue_size)),
          block_processing_task_(new Task("block-processing", config::block_processin_queue_size)),
          rpc_fetching_block_task_(new Task("rpc-fetching-block", config::rpc_queue_size)),
-         utility_task_(new Task("utility-processing", 2))
+         utility_task_(new Task("utility-processing", 3))
 {
     srand(time(0));
 }
@@ -139,8 +141,13 @@ void Fetcher::run(uint256_t block_id) {
     //
     if (!this->utility_task_->is_active()) {
         utility_task_->async([this] {
-            Fetcher::log->info("Fetcher: utility fetching started ...");
+            Fetcher::log->info("Fetcher: states fetching started ...");
             this->fetch_states();
+        });
+
+        utility_task_->async([this] {
+            Fetcher::log->info("Fetcher: genesis fetching started ...");
+            this->fetch_genesis();
         });
     }
 
@@ -280,6 +287,38 @@ void Fetcher::fetch_states(){
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(this->update_timeout_));
+    }
+}
+
+void Fetcher::fetch_genesis() {
+
+    while(utility_task_->is_running()) {
+
+        try {
+            auto client = milecsa::http::Client::Connect(config::genesis_url, true, Fetcher::error_handler);
+
+            if (!client) {
+                Logger::err->warn("Fetcher: genesis request failed, retrying");
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                continue;
+            }
+
+            if (auto body = client->get()) {
+                auto genesis = milecsa::explorer::Genesis::Parser(body.value());
+                this->get_db()->update_genesis(genesis->get_transactions());
+            }
+        }
+
+        catch (std::exception &e) {
+            Fetcher::err->error("Fetcher: {} error fetching genesis data: {}", " = ", e.what());
+            continue;
+        }
+        catch (...) {
+            Fetcher::err->error("Fetcher: genesis something wrong ...");
+            continue;
+        }
+
+        break;
     }
 }
 

@@ -16,9 +16,11 @@ namespace milecsa::explorer::table {
                 name::blocks,
                 name::blocks_processing,
                 name::wallets,
+                name::wallets_state,
                 name::transactions,
                 name::transactions_state,
                 name::transactions_processing,
+                name::genesis_transactions,
                 name::turnovers,
                 name::transaction_turnover
         };
@@ -37,7 +39,9 @@ namespace milecsa::explorer::table {
                 {name::transactions, "serial"},
                 {name::transactions, "timestamp"},
                 {name::transactions_processing, "block-id"},
-
+                {name::genesis_transactions, "serial"},
+                {name::genesis_transactions, "block-id"},
+                {name::genesis_transactions, "digest"},
         };
         return indices;
     }

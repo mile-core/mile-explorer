@@ -63,6 +63,8 @@ namespace milecsa::explorer {
          */
          optional<Db> &get_db();
 
+        optional<milecsa::rpc::Client> get_rpc();
+
     private:
         Fetcher(const std::vector<std::string> &urls,
                 int read_timeout,
@@ -79,11 +81,11 @@ namespace milecsa::explorer {
 
         shared_ptr<Task> utility_task_;
 
-        optional<milecsa::rpc::Client> get_rpc();
-
         void fetch_blocks(uint256_t from, uint256_t to);
 
         void fetch_states();
+
+        void fetch_genesis();
     };
 }
 

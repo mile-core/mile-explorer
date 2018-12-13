@@ -4,6 +4,7 @@
 
 #include "utils.hpp"
 #include "config.hpp"
+#include "fetcher.hpp"
 
 namespace milecsa::explorer {
 
@@ -39,5 +40,20 @@ namespace milecsa::explorer {
             first = false;
         }
         return min + rand() % (( max + 1 ) - min);
+    }
+
+    std::optional<milecsa::rpc::Client> get_rpc() {
+
+        static uint64_t counter = 0;
+
+        auto url = milecsa::explorer::config::node_urls[counter++ % milecsa::explorer::config::node_urls.size()];
+
+        auto c = milecsa::rpc::Client::Connect(
+                url,
+                true,
+                milecsa::explorer::Fetcher::response_fail_handler,
+                milecsa::explorer::Fetcher::error_handler);
+
+        return std::move(c);
     }
 }

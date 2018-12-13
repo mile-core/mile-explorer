@@ -82,6 +82,7 @@ namespace milecsa::explorer {
          */
         static int            rpc_pool_size;
 
+        static std::string genesis_url;
     };
 
     template <typename T>

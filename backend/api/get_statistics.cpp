@@ -36,6 +36,37 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
         return true;
     }
 
+    else if (name == "wallets-top") {
+
+        if (!api::params::check(ctx, "asset-code")) return false;
+        if (!api::params::check(ctx, "limit")) return false;
+
+        auto code  = ctx.request.params.at("asset-code").get<unsigned short>();
+        auto limit = ctx.request.params.at("limit").get<uint64_t>();
+
+        std::string table = "wallets_top_xdr";
+        milecsa::token asset = milecsa::assets::TokenFromCode(code);
+
+        if (asset.code == milecsa::assets::XDR.code) {
+            table = "wallets_top_xdr";
+        }
+        else if (asset.code == milecsa::assets::MILE.code) {
+            table = "wallets_top_mile";
+        }
+        else {
+            make_response_parse_error(ctx, "token not found");
+            return false;
+        }
+
+        ctx.response.result = db
+                ->open_table(table)
+                ->cursor()
+                .between(0,limit,"position")
+                .get_data();
+
+        return true;
+    }
+
     else {
         make_response_parse_error(ctx, "statistics not found");
         return false;
