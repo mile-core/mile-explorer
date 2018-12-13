@@ -147,6 +147,12 @@ namespace milecsa::explorer{
         void add_node_states(const db::Data &nodes_state, uint256_t block_id);
 
         /**
+         * Update genesis
+         * @param genesis
+         */
+        void update_genesis(const db::Data &genesis);
+
+        /**
          * Get the last block id indexed in DB
          * @return
          */
@@ -213,6 +219,7 @@ namespace milecsa::explorer{
 
         uint64_t add_stream_transaction(const db::Data &imput_trx,
                 uint256_t block_id, time_t t, db::Data &output_trx);
+
 
         void add_wallet_transaction(const db::Data &transactions, uint256_t block_id, time_t t);
 

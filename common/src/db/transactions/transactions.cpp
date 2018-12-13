@@ -48,7 +48,8 @@ inline map<string,string> find_public_keys(const db::Data &trx, std::string bloc
     return ret;
 }
 
-uint64_t Db::add_stream_transaction(const db::Data &input_trx,
+uint64_t Db::add_stream_transaction(
+        const db::Data &input_trx,
         uint256_t block_id, time_t t,
         db::Data &output_trx) {
 

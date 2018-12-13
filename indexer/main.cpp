@@ -105,6 +105,8 @@ static bool parse_cmdline(int ac, char *av[]) {
             Logger::log->trace("Configure: add node: {}", url);
         }
 
+        config::genesis_url = config_nodes["genesis_url"].as<string>();
+
         config::request_timeout  = config_nodes["request_timeout"].as<time_t>();
         config::update_timeout   = config_nodes["update_timeout"].as<time_t>();
         config::rpc_connection_timeout  = config_nodes["rpc_connection_timeout"].as<time_t>();

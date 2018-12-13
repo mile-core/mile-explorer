@@ -84,6 +84,8 @@ namespace milecsa::explorer {
         void fetch_blocks(uint256_t from, uint256_t to);
 
         void fetch_states();
+
+        void fetch_genesis();
     };
 }
 

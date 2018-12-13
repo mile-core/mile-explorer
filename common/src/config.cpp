@@ -36,3 +36,5 @@ time_t config::procesing_refresh_time = 1;
 string         config::http_bind_address = "0.0.0.0";
 unsigned short config::http_port         = 8042;
 int            config::rpc_pool_size     = 64;
+
+std::string config::genesis_url = "https://raw.githubusercontent.com/mile-core/mile-files/master/genesis_block.txt";

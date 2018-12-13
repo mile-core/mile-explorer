@@ -237,3 +237,4 @@ bool Db::init() {
 
     return init_db;
 }
+
