@@ -5,6 +5,7 @@
 #include "utils.hpp"
 #include "config.hpp"
 #include "fetcher.hpp"
+#include <milecsa_jsonrpc.hpp>
 
 namespace milecsa::explorer {
 
@@ -42,11 +43,11 @@ namespace milecsa::explorer {
         return min + rand() % (( max + 1 ) - min);
     }
 
-    std::optional<milecsa::rpc::Client> get_rpc() {
+    std::optional<milecsa::rpc::Client> get_rpc(const std::vector<std::string> &urls) {
 
         static uint64_t counter = 0;
 
-        auto url = milecsa::explorer::config::node_urls[counter++ % milecsa::explorer::config::node_urls.size()];
+        auto url = urls[counter++ % urls.size()];
 
         auto c = milecsa::rpc::Client::Connect(
                 url,
