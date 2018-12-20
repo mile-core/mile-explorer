@@ -2,6 +2,6 @@ POST http://localhost:8042/v1/api
 Accept: */*
 Cache-Control: no-cache
 
-{"jsonrpc":"2.0","method":"get-statistics","params":{"name":"wallets-top", "asset-code":0, "limit":2},"id":"1"}
+{"jsonrpc":"2.0","method":"get-statistics","params":{"name":"wallets-top", "asset-code":1, "limit":2},"id":"1"}
 
 ###
