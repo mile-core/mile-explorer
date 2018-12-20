@@ -22,7 +22,7 @@ RUN apt update && \
 
     chmod +x /usr/local/bin/docker-entrypoint.sh && \
 
-    apt autoremove -y --purge build-essential cmake python3-dev libssl-dev libcurl4-gnutls-dev git && \
+    apt autoremove -y --purge build-essential cmake libssl-dev libcurl4-gnutls-dev git && \
     apt clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /build
 

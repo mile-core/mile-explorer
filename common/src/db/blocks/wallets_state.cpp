@@ -52,7 +52,7 @@ void Db::update_wallet_state(const std::string &public_key){
 
                 client.reset();
 
-                Db::log->info("Db: {} wallet state retry...", public_key);
+                Db::err->error("Db: {} wallet state retry...", public_key);
 
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
