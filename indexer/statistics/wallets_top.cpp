@@ -8,11 +8,15 @@
 #include <string>
 #include <array>
 
+static std::string table_name = "wallets_top";
+typedef std::pair<std::string,std::string>  mpair;
+typedef std::vector<mpair> mvector;
+
 template <typename T>
 std::vector<T> mslice(std::vector<T> v, int start=0, int end=-1) {
 
     std::sort(v.begin(), v.end(),
-              [](const std::pair<std::string,std::string> & a, const std::pair<std::string,std::string> & b) -> bool
+              [](const T & a, const T & b) -> bool
               {
                   return std::stof(a.second)>std::stof(b.second);
               });
@@ -42,23 +46,77 @@ std::vector<T> mslice(std::vector<T> v, int start=0, int end=-1) {
     return nv;
 }
 
+static void filter(
+        const db::Data &items,
+        mvector &xdr,
+        mvector &mile) {
+
+    std::for_each(items.begin(), items.end(), [&xdr,&mile](db::Data a) {
+        if (a.count("balance") == 0)
+            return;
+
+        for (auto coin:  a["balance"]) {
+
+            if (coin.count("code") == 0)
+                return;
+
+            if (coin.count("amount") == 0)
+                return;
+
+            auto x = coin["code"].get<std::string>();
+
+            unsigned short code = std::stoi(x);
+            auto id = a["id"].get<std::string>();
+            auto amount = coin["amount"].get<std::string>();
+
+            if ( code == milecsa::assets::XDR.code ) {
+                xdr.push_back(mpair(id,amount));
+            }
+            else if ( code == milecsa::assets::MILE.code ) {
+                mile.push_back(mpair(id,amount));
+            }
+        }
+    });
+};
+
+static void update(
+        const ctxDb &db,
+        const milecsa::token& token,
+        const mvector &slice){
+
+    uint64_t count = 0;
+
+    for (auto &item: slice) {
+
+        std::string id = std::to_string(count);
+        id.append(":");
+        id.append(std::to_string(token.code));
+
+        db::Data trx = {
+                {"id", id},
+                {"position", count},
+                {"public-key", item.first},
+                {"amount", item.second},
+                {"asset-code", token.code}
+        };
+
+        db->open_table(table_name)->update(trx);
+
+        count++;
+    }
+};
+
 
 static auto method = [](const ctxDb &db, time_t last) {
 
-    static std::string xdr_table = "wallets_top_xdr";
-    static std::string mile_table = "wallets_top_mile";
+    mvector xdr;
+    mvector mile;
 
-    if (!db->has_table(xdr_table))
-        db->create_table(xdr_table);
+    if (!db->has_table(table_name))
+        db->create_table(table_name);
 
-    if (!db->has_table(mile_table))
-        db->create_table(mile_table);
+    auto table = db->open_table(table_name);
 
-    auto table = db->open_table(xdr_table);
-    if (!table->has_index("position"))
-        table->create_index("position");
-
-    table = db->open_table(mile_table);
     if (!table->has_index("position"))
         table->create_index("position");
 
@@ -66,58 +124,13 @@ static auto method = [](const ctxDb &db, time_t last) {
             ->cursor()
             .get_data();
 
-    auto filter = [&items](const milecsa::token& token, std::vector<std::pair<std::string,std::string>> &result) {
-
-        std::for_each(items.begin(), items.end(), [&result,token](db::Data a) {
-            if (a.count("balance") == 0)
-                return;
-
-            for (auto coin:  a["balance"]) {
-
-                if (coin.count("code") == 0)
-                    return;
-
-                if (coin.count("amount") == 0)
-                    return;
-
-                auto x = coin["code"].get<std::string>();
-
-                if (std::stoi(x) == token.code) {
-                    result.push_back(std::pair<std::string, std::string>(a["id"], coin["amount"].get<std::string>()));
-                }
-            }
-        });
-    };
-
-    std::vector<std::pair<std::string,std::string>> xdr;
-    std::vector<std::pair<std::string,std::string>> mile;
-
-    filter(milecsa::assets::XDR,xdr);
-    filter(milecsa::assets::MILE,mile);
+    filter(items, xdr, mile);
 
     xdr  = mslice(xdr, 0, 1024);
     mile = mslice(mile,0, 1024);
 
-    auto update = [&](std::vector<std::pair<std::string,std::string>> &slice, const std::string &table){
-        uint64_t count = 0;
-
-        for (auto &item: slice) {
-
-            db::Data trx = {
-                    {"id", std::to_string(count)},
-                    {"position", count},
-                    {"public-key", item.first},
-                    {"amount", item.second}
-            };
-
-            db->open_table(table)->update(trx);
-
-            count++;
-        }
-    };
-
-    update(xdr,xdr_table);
-    update(mile,mile_table);
+    update(db, milecsa::assets::XDR, xdr);
+    update(db, milecsa::assets::MILE, mile);
 };
 
 MILECSA_REGESTRY_STAT_METHOD("wallets_top",method);

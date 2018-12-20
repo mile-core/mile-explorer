@@ -34,8 +34,9 @@ void Db::update_wallet_state(const std::string &public_key){
                         state["timestamp"] = std::time(0);
 
                         state.erase("preferred-transaction-id");
+                        state["id"] = public_key;
 
-                        this->open_table(table::name::wallets_state)->update(public_key, state);
+                        this->open_table(table::name::wallets_state)->update(state);
 
                         Db::log->debug("Db: {} wallet state {}", public_key, state.dump());
 
@@ -51,7 +52,7 @@ void Db::update_wallet_state(const std::string &public_key){
 
                 client.reset();
 
-                Db::err->error("Db: {} wallet state retry...", public_key);
+                Db::log->info("Db: {} wallet state retry...", public_key);
 
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }

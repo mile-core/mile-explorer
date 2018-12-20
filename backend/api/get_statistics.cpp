@@ -44,16 +44,10 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
         auto code  = ctx.request.params.at("asset-code").get<unsigned short>();
         auto limit = ctx.request.params.at("limit").get<uint64_t>();
 
-        std::string table = "wallets_top_xdr";
+        std::string table = "wallets_top";
         milecsa::token asset = milecsa::assets::TokenFromCode(code);
 
-        if (asset.code == milecsa::assets::XDR.code) {
-            table = "wallets_top_xdr";
-        }
-        else if (asset.code == milecsa::assets::MILE.code) {
-            table = "wallets_top_mile";
-        }
-        else {
+        if (asset.code != milecsa::assets::XDR.code && asset.code != milecsa::assets::MILE.code) {
             make_response_parse_error(ctx, "token not found");
             return false;
         }
@@ -62,6 +56,7 @@ static auto method = [](server::context &ctx, const ctxDb &db) {
                 ->open_table(table)
                 ->cursor()
                 .between(0,limit,"position")
+                .filter("asset-code",asset.code)
                 .get_data();
 
         return true;
