@@ -18,7 +18,7 @@ target_link_libraries (
         ${CMAKE_THREAD_LIBS_INIT}
         ${Boost_LIBRARIES}
         mile-explorerdb
-        /home/atticus/CLionProjects/mile-explorer/vendor/librethinkdbxx/build/librethinkdb++.a
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/librethinkdbxx/build/librethinkdb++.a
         milecsa_dispatchq
 )
 
