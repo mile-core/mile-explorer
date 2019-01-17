@@ -76,6 +76,8 @@ namespace milecsa::explorer {
              */
             void insert(const db::Data &data);
 
+            void insert_with_replace(const db::Data &data);
+
             void update(const db::Data &data);
 
             /**

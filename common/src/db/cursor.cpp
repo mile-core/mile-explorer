@@ -208,3 +208,107 @@ db::Cursor db::Cursor::sort_field(const string &index)const {
     }
     return db::Cursor();
 }
+
+db::Cursor db::Cursor::filter(const db::Driver::Term &term)const {
+    try {
+
+        auto result = cursor_.filter(term);
+
+        return  db::Cursor(
+        result,
+        std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error filter: {}", db_->get_name(), e.message);
+    }
+    return db::Cursor();
+}
+
+db::Cursor db::Cursor::order_by(const db::Driver::Term &term)const {
+    try {
+
+        auto result = cursor_.order_by(term);
+
+        return  db::Cursor(
+        result,
+        std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error order_by: {}", db_->get_name(), e.message);
+    }
+    return db::Cursor();
+}
+
+db::Cursor db::Cursor::group(const string &field)const {
+    try {
+
+        auto result = cursor_.group(field);
+
+        return  db::Cursor(
+        result,
+        std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error group: {}", db_->get_name(), e.message);
+    }
+    return db::Cursor();
+}
+
+db::Cursor db::Cursor::limit_func(const int &amount)const {
+    try {
+
+        auto result = cursor_.limit(amount);
+
+        return  db::Cursor(
+        result,
+        std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error limit_func: {}", db_->get_name(), e.message);
+    }
+    return db::Cursor();
+}
+
+db::Cursor db::Cursor::concatMap(std::function<db::Driver::Term(db::Driver::Var)> f)const {
+    try {
+        auto result = cursor_.concat_map(f);
+
+        return  db::Cursor(
+        result,
+        std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error concatMap: {}", db_->get_name(), e.message);
+    }
+    return db::Cursor();
+}
+
+db::Cursor db::Cursor::concatMap(const db::Driver::Term &term)const {
+    try {
+
+        auto result = cursor_.concat_map(term);
+
+        return  db::Cursor(
+        result,
+        std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error concatMap: {}", db_->get_name(), e.message);
+    }
+    return db::Cursor();
+}
+
+db::Cursor db::Cursor::ungroup()const {
+    try {
+
+        auto result = cursor_.ungroup();
+
+        return  db::Cursor(
+        result,
+        std::move(db_));
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error ungroup: {}", db_->get_name(), e.message);
+    }
+    return db::Cursor();
+}

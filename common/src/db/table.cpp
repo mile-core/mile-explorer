@@ -77,6 +77,20 @@ void db::Table::insert(const milecsa::explorer::db::Data &data) {
     }
 }
 
+void db::Table::insert_with_replace(const milecsa::explorer::db::Data &data) {
+    try{
+        auto connection = db_->get_connection();
+        db::Driver::Term q = db_->query();
+
+        q.table(name_)
+        .insert(db::Driver::json(data.dump()), db::Driver::optargs("conflict", "replace"))
+        .run(*connection);
+    }
+    catch (db::Error &e) {
+        Db::err->error("Table: {} error insert: {}", db_->get_name(), e.message);
+    }
+}
+
 void db::Table::update(const db::Data &data){
     try {
         auto connection = db_->get_connection();
