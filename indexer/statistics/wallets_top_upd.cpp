@@ -54,7 +54,7 @@ namespace wallets_top_upd {
                 .group("code")
                 .order_by(db::Driver::desc(db::Driver::row["amount"].coerce_to("NUMBER")))
                 .limit_func(each_type_amount)
-                .fold(0, position_increaser, get_resulted_object)
+                .fold(0, position_increaser, db::Driver::optargs("emit", get_resulted_object))
                 .ungroup()
                 .concatMap(db::Driver::row["reduction"])
                 .get_data();

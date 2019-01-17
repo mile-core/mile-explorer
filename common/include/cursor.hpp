@@ -54,12 +54,12 @@ namespace milecsa::explorer {
             Cursor limit_func(const int &amount)const;
             Cursor ungroup()const;
             template <typename T>
-            Cursor fold(T agg_value,
+            Cursor fold(const T& base_value,
                         std::function<db::Driver::Term(db::Driver::Var, db::Driver::Var)> reduce_value_f,
-                        std::function<db::Driver::Term(db::Driver::Var, db::Driver::Var, db::Driver::Var)> emit_f)const {
+                        db::Driver::OptArgs&& opt_args) const {
                 try {
-                    
-                    auto result = cursor_.fold(agg_value, reduce_value_f, db::Driver::optargs("emit", emit_f));
+
+                    auto result = cursor_.fold(base_value, reduce_value_f, std::move(opt_args));
 
                     return  db::Cursor(
                     result,
