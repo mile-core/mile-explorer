@@ -269,7 +269,7 @@ db::Cursor db::Cursor::limit_func(const int &amount)const {
     return db::Cursor();
 }
 
-db::Cursor db::Cursor::concatMap(std::function<db::Driver::Term(db::Driver::Var)> f)const {
+db::Cursor db::Cursor::concat_map(std::function<db::Driver::Term(db::Driver::Var)> f)const {
     try {
         auto result = cursor_.concat_map(f);
 
@@ -278,12 +278,12 @@ db::Cursor db::Cursor::concatMap(std::function<db::Driver::Term(db::Driver::Var)
         std::move(db_));
     }
     catch (db::Error &e) {
-        Db::err->error("Table: {} error concatMap: {}", db_->get_name(), e.message);
+        Db::err->error("Table: {} error concat_map: {}", db_->get_name(), e.message);
     }
     return db::Cursor();
 }
 
-db::Cursor db::Cursor::concatMap(const db::Driver::Term &term)const {
+db::Cursor db::Cursor::concat_map(const db::Driver::Term &term)const {
     try {
 
         auto result = cursor_.concat_map(term);
@@ -293,7 +293,7 @@ db::Cursor db::Cursor::concatMap(const db::Driver::Term &term)const {
         std::move(db_));
     }
     catch (db::Error &e) {
-        Db::err->error("Table: {} error concatMap: {}", db_->get_name(), e.message);
+        Db::err->error("Table: {} error concat_map: {}", db_->get_name(), e.message);
     }
     return db::Cursor();
 }

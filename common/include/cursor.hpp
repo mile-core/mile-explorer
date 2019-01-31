@@ -48,11 +48,12 @@ namespace milecsa::explorer {
 
             Cursor filter(const db::Driver::Term &term)const;
             Cursor order_by(const db::Driver::Term &term)const;
-            Cursor concatMap(std::function<db::Driver::Term(db::Driver::Var)> f)const;
-            Cursor concatMap(const db::Driver::Term &term)const;
+            Cursor concat_map(std::function<db::Driver::Term(db::Driver::Var)> f)const;
+            Cursor concat_map(const db::Driver::Term &term)const;
             Cursor group(const string &field)const;
             Cursor limit_func(const int &amount)const;
             Cursor ungroup()const;
+
             template <typename T>
             Cursor fold(const T& base_value,
                         std::function<db::Driver::Term(db::Driver::Var, db::Driver::Var)> reduce_value_f,
