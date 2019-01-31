@@ -134,3 +134,4 @@ static auto method = [](const ctxDb &db, time_t last) {
 };
 
 MILECSA_REGESTRY_STAT_METHOD("wallets_top",method);
+

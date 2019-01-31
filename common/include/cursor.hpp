@@ -46,6 +46,31 @@ namespace milecsa::explorer {
             db::Data          get_data();
             double            get_number();
 
+            Cursor filter(const db::Driver::Term &term)const;
+            Cursor order_by(const db::Driver::Term &term)const;
+            Cursor concatMap(std::function<db::Driver::Term(db::Driver::Var)> f)const;
+            Cursor concatMap(const db::Driver::Term &term)const;
+            Cursor group(const string &field)const;
+            Cursor limit_func(const int &amount)const;
+            Cursor ungroup()const;
+            template <typename T>
+            Cursor fold(const T& base_value,
+                        std::function<db::Driver::Term(db::Driver::Var, db::Driver::Var)> reduce_value_f,
+                        db::Driver::OptArgs&& opt_args) const {
+                try {
+
+                    auto result = cursor_.fold(base_value, reduce_value_f, std::move(opt_args));
+
+                    return  db::Cursor(
+                    result,
+                    std::move(db_));
+                }
+                catch (db::Error &e) {
+                    Db::err->error("Table: {} error fold: {}", db_->get_name(), e.message);
+                }
+                return db::Cursor();
+            }
+
             Cursor max(const string &id)const;
             Cursor min(const string &id)const;
             Cursor field(const string &field_name)const;
