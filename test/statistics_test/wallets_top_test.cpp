@@ -14,7 +14,7 @@ typedef std::chrono::duration<float> fsec;
 BOOST_AUTO_TEST_CASE(wallets_top_test){
     auto db = milecsa::explorer::Db::Open();
     auto t0 = Time::now();
-    method(db, 0);
+    wallets_top_legacy::method(db, 0);
     auto t1 = Time::now();
 
     fsec fs = t1 - t0;
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(wallets_top_test){
 BOOST_AUTO_TEST_CASE(wallets_top_upd_test){
     auto db = milecsa::explorer::Db::Open();
     auto t0 = Time::now();
-    wallets_top_upd::method(db, 0);
+    method(db, 0);
     auto t1 = Time::now();
 
     fsec fs = t1 - t0;
